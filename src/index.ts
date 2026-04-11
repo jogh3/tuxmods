@@ -9,14 +9,25 @@ function errorhandle(err: any): string {
   return "";
 }
 
+const mimetypes: any = {
+  '.html': 'text/html',
+  '.css': 'text/css',
+  '.js': 'text/javascript',
+  '.json': 'text/json'
+};
+
 const server = http.createServer((req: any, res: any) => {
-  const sitepath: string = path.join(__dirname, 'public', 'index.html');
+  const requrl: string = req.url === "/" ? "index.html" : req.url; 
+  const sitepath: string = path.join(__dirname, 'public', requrl);
+  const filetype: string = path.extname(sitepath);
+  const conttype: string = mimetypes[filetype] || "text/plain";
   fs.readFile(sitepath,'utf8', (err: any, filedata: string) => {
     if (err) {
       res.writeHead(500);
       return res.end('error loading page');
     }
-    res.writeHead(200, {'Content-Type': 'text/html'});
+    
+    res.writeHead(200, {'Content-Type': conttype});
     res.end(filedata);
   });
 });
