@@ -18,7 +18,7 @@ const mimetypes: any = {
 
 const server = http.createServer((req: any, res: any) => {
   const requrl: string = req.url === "/" ? "index.html" : req.url; 
-  const sitepath: string = path.join(__dirname, '..' , 'public', requrl);
+  const sitepath: string = path.join(__dirname,'..', 'public', requrl);
   const filetype: string = path.extname(sitepath);
   const conttype: string = mimetypes[filetype] || "text/plain";
   const method: string = req.method;
