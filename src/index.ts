@@ -22,20 +22,21 @@ const server = http.createServer((req: any, res: any) => {
   const filetype: string = path.extname(sitepath);
   const conttype: string = mimetypes[filetype] || "text/plain";
   const method: string = req.method;
-  fs.readFile(sitepath,'utf8', (err: any, filedata: string) => {
-    if (err) {
-      res.writeHead(500);
-      return res.end('error loading page');
-    }
-    if(method === "GET"){ 
-    res.writeHead(200, {'Content-Type': conttype});
-    res.end(filedata);
-    }
-    if (method === "POST"){
-    res.writeHead(200,{'Content-Type': conttype});
-    res.end('{"idk": "fuck"}');
-    }
-  });
+  if (method === 'GET'){
+    fs.readFile(sitepath,'utf8', (err: any, filedata: string) => {
+      if (err) {
+        res.writeHead(500);
+        return res.end('error loading page');
+      }
+      
+      res.writeHead(200, {'Content-Type': conttype});
+      res.end(filedata);
+    });
+  }
+  if(method === 'POST'){
+    res.writeHead(204);
+    res.end();
+  }
 });
 server.listen(port, url, () => {
   console.log('dirname = ',__dirname);
