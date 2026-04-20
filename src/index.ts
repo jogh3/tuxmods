@@ -53,10 +53,11 @@ const server = http.createServer((req: any, res: any) => {
       case "/dothing":
         dothing();
         break;
-      case "dothingtoo":
+      case "/dothingtoo":
         dothingtoo();
         break;
       default:
+        console.log("post invalid");
         break;
     }
     res.writeHead(204);

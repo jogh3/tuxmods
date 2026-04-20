@@ -4,6 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const reqpayload = {
       method: "POST"
     };
-    fetch('/testpost', reqpayload);
+    fetch('/dothing', reqpayload);
+  })
+  document.getElementById('test2').addEventListener('click', (event) => {
+    console.log("test pressed");
+    const reqpayload = {
+      method: "POST"
+    };
+    fetch('/dothingtoo',reqpayload);
   })
 });
