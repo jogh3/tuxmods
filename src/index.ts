@@ -16,14 +16,29 @@ const mimetypes: any = {
   '.json': 'text/json'
 };
 
+function dothing() {
+  console.log("did thing");
+  return;
+}
+function dothingtoo() {
+  console.log("did thing too electric boogaloo");
+  return;
+}
+
 const server = http.createServer((req: any, res: any) => {
-  const requrl: string = req.url === "/" ? "index.html" : req.url; 
-  const sitepath: string = path.join(__dirname,'..', 'public', requrl);
-  const filetype: string = path.extname(sitepath);
+  const publicdir: string = path.join(__dirname,'..', 'public');
+  const requestedfilepath: string = path.join(publicdir, req.url === '/' ? '/index.html' : req.url);
+  const absolutepath: string = path.resolve(requestedfilepath);
+  const safesecurityzone: string = path.resolve(publicdir);
+  if (!absolutepath.startsWith(safesecurityzone)) {
+    res.writeHead(403); // 403 means forbidden
+    return res.end("nice try, but you don't fuckle with shuckle");
+  }
+  const filetype: string = path.extname(requestedfilepath);
   const conttype: string = mimetypes[filetype] || "text/plain";
   const method: string = req.method;
   if (method === 'GET'){
-    fs.readFile(sitepath,'utf8', (err: any, filedata: string) => {
+    fs.readFile(requestedfilepath,'utf8', (err: any, filedata: string) => {
       if (err) {
         res.writeHead(500);
         return res.end('error loading page');
@@ -34,11 +49,23 @@ const server = http.createServer((req: any, res: any) => {
     });
   }
   if(method === 'POST'){
+    switch (req.url) {
+      case "/dothing":
+        dothing();
+        break;
+      case "dothingtoo":
+        dothingtoo();
+        break;
+      default:
+        break;
+    }
     res.writeHead(204);
     res.end();
+    return;
   }
 });
 server.listen(port, url, () => {
+  console.log('[ .  . ]  \n   \\\/ \n/  > _ \\');
   console.log('dirname = ',__dirname);
   console.log(`server running at http://localhost:${port}/`);
 });

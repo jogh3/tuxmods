@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('test').addEventListener('click', (event) => {
     console.log("testy pressed");
-    payload{
+    const reqpayload = {
       method: "POST"
-    }
-    fetch('localhost:8080/testpost')
+    };
+    fetch('/testpost', reqpayload);
   })
 });
