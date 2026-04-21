@@ -9,11 +9,22 @@ function errorhandle(err: any): string {
   return "";
 }
 
-const mimetypes: any = {
+function get_test() {
+  return;
+}
+
+const filetypes: any = {
   '.html': 'text/html',
   '.css': 'text/css',
   '.js': 'text/javascript',
   '.json': 'text/json'
+};
+const getroutes: any = {
+  'getest': get_test
+};
+const postroutes: any = {
+  '/dothing': dothing,
+  '/dothingtoo': dothingtoo
 };
 
 function dothing() {
@@ -35,30 +46,24 @@ const server = http.createServer((req: any, res: any) => {
     return res.end("nice try, but you don't fuckle with shuckle");
   }
   const filetype: string = path.extname(requestedfilepath);
-  const conttype: string = mimetypes[filetype] || "text/plain";
+  const conttype: string = filetypes[filetype] || "text/plain";
   const method: string = req.method;
   if (method === 'GET'){
-    fs.readFile(requestedfilepath,'utf8', (err: any, filedata: string) => {
+    fs.readFile(requestedfilepath, (err: any, filedata: string) => {
       if (err) {
         res.writeHead(500);
         return res.end('error loading page');
       }
-      
       res.writeHead(200, {'Content-Type': conttype});
       res.end(filedata);
     });
   }
   if(method === 'POST'){
-    switch (req.url) {
-      case "/dothing":
-        dothing();
-        break;
-      case "/dothingtoo":
-        dothingtoo();
-        break;
-      default:
-        console.log("post invalid");
-        break;
+    const handler: any= postroutes[req.url];
+    if (handler){
+      handler();
+    } else {
+      console.log('invalid post req');
     }
     res.writeHead(204);
     res.end();
@@ -66,7 +71,9 @@ const server = http.createServer((req: any, res: any) => {
   }
 });
 server.listen(port, url, () => {
-  console.log('[ .  . ]  \n   \\\/ \n/  > _ \\');
+  console.log('[ .  . ]');
+  console.log('   \\\/ ');
+  console.log('/  > _ \\');
   console.log('dirname = ',__dirname);
   console.log(`server running at http://localhost:${port}/`);
 });
