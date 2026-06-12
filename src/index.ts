@@ -13,12 +13,16 @@ function get_test() {
   return;
 }
 
-const filetypes: any = {
+const filetypes: string = {
   '.html': 'text/html',
   '.css': 'text/css',
   '.js': 'text/javascript',
-  '.json': 'text/json'
-};
+  '.json': 'application/json', // note: json is usually application/json
+  '.ico': 'image/x-icon',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml'
+};;
 const getroutes: any = {
   'getest': get_test
 };
@@ -49,7 +53,7 @@ const server = http.createServer((req: any, res: any) => {
   const conttype: string = filetypes[filetype] || "text/plain";
   const method: string = req.method;
   if (method === 'GET'){
-    fs.readFile(requestedfilepath, (err: any, filedata: string) => {
+    fs.readFile(requestedfilepath, (err: any, filedata: Buffer) => {
       if (err) {
         res.writeHead(500);
         return res.end('error loading page');
@@ -59,7 +63,7 @@ const server = http.createServer((req: any, res: any) => {
     });
   }
   if(method === 'POST'){
-    const handler: any= postroutes[req.url];
+    const handler: any = postroutes[req.url];
     if (handler){
       handler();
     } else {
