@@ -6,8 +6,12 @@ body {
   margin: 0;
 }
 
-h1,h2, p, li {
+h1,h2, p, li, pre {
   color: #d0cfd1; /*#b6b6b8*/
+}
+
+#top-bar pre {
+  color: #a271f7; /* #804cd1 */
 }
 
 #sidebar ul {
@@ -35,7 +39,6 @@ h1,h2, p, li {
 }
 
 #sidebar button {
-  flex: 1;
   padding: 10px;
   font-size: 15px
 }
@@ -43,4 +46,7 @@ h1,h2, p, li {
 #main_body {
   flex: 1; /* fills the horizontal space next to the sidebar */
   padding: 10px;
+}
+#top-bar {
+  border-bottom: 5px ridge black;
 }

@@ -1,4 +1,4 @@
 node_modules
 build
 *.sh
-*.txt
+res and req format.txt
