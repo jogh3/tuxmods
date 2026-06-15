@@ -12,6 +12,7 @@ h1,h2, p, li, pre {
 
 #top-bar pre {
   color: #a271f7; /* #804cd1 */
+  font-size: 14px;
 }
 
 #sidebar ul {
@@ -24,7 +25,8 @@ h1,h2, p, li, pre {
 
 #sidebar li {
   font-size: 25px;
-  padding-left: 20px;
+  padding-left: 0px;
+  padding-bottom: 5px;
 }
 
 #content-wrapper {
@@ -39,8 +41,25 @@ h1,h2, p, li, pre {
 }
 
 #sidebar button {
-  padding: 10px;
-  font-size: 15px
+  padding-left: 20px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  font-size: 15px;
+  flex-wrap: wrap;
+  width: 100%;
+  text-align: left;
+  background-color: #2f2c33;
+  border: #2f2c33;
+  color: #d0cfd1;
+  transition-duration: 0.4s;
+  border-radius: 4px;
+}
+
+#sidebar button:hover{
+  background-color: #634091;
+}
+#sidebar button:focus{
+  background-color: #3f295c;
 }
 
 #main_body {

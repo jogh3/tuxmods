@@ -1,19 +1,22 @@
-const http: any = require('http');
-const fs: any = require('fs');
-const path: any = require('path');
+import * as http from 'http';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+import * as get_funcs from './get_funcs.js';
+import * as post_funcs from './post_funcs.js';
+
+const __filename: string = fileURLToPath(import.meta.url);
+const __dirname: string = path.dirname(__filename);
 
 var port: number = 6942;
-var url: string = 'localhost';
+var host: string = 'localhost';
 
 function errorhandle(err: any): string {
   return "";
 }
 
-function get_test() {
-  return;
-}
-
-const filetypes: string = {
+const filetypes: Record<string, string> = {
   '.html': 'text/html',
   '.css': 'text/css',
   '.js': 'text/javascript',
@@ -22,27 +25,12 @@ const filetypes: string = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml'
-};;
-const getroutes: any = {
-  'getest': get_test
-};
-const postroutes: any = {
-  '/dothing': dothing,
-  '/dothingtoo': dothingtoo
 };
 
-function dothing() {
-  console.log("did thing");
-  return;
-}
-function dothingtoo() {
-  console.log("did thing too electric boogaloo");
-  return;
-}
-
-const server = http.createServer((req: any, res: any) => {
+const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
+  const safe_url: string = req.url || '/'; 
   const publicdir: string = path.join(__dirname,'..', 'public');
-  const requestedfilepath: string = path.join(publicdir, req.url === '/' ? '/index.html' : req.url);
+  const requestedfilepath: string = path.join(publicdir, safe_url === '/' ? '/index.html' : safe_url);
   const absolutepath: string = path.resolve(requestedfilepath);
   const safesecurityzone: string = path.resolve(publicdir);
   if (!absolutepath.startsWith(safesecurityzone)) {
@@ -51,8 +39,19 @@ const server = http.createServer((req: any, res: any) => {
   }
   const filetype: string = path.extname(requestedfilepath);
   const conttype: string = filetypes[filetype] || "text/plain";
-  const method: string = req.method;
+  const method: string = req.method || 'GET';
   if (method === 'GET'){
+    if (filetype == ''){
+      const index_path: string = path.join(publicdir, 'index.html');
+      fs.readFile(index_path, (err: any, index_data: Buffer) => {
+        if (err) {
+          res.writeHead(500);
+          return res.end('error loading index');
+        }
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        return res.end(index_data);
+      })
+    } else {
     fs.readFile(requestedfilepath, (err: any, filedata: Buffer) => {
       if (err) {
         res.writeHead(500);
@@ -61,9 +60,9 @@ const server = http.createServer((req: any, res: any) => {
       res.writeHead(200, {'Content-Type': conttype});
       res.end(filedata);
     });
-  }
+  }}
   if(method === 'POST'){
-    const handler: any = postroutes[req.url];
+    const handler: any = post_funcs.postroutes[safe_url];
     if (handler){
       handler();
     } else {
@@ -74,10 +73,12 @@ const server = http.createServer((req: any, res: any) => {
     return;
   }
 });
-server.listen(port, url, () => {
+
+server.listen(port, host, () => {
+  console.log('starting tuxmods')
   console.log('[ .  . ]');
   console.log('   \\\/ ');
   console.log('/  > _ \\');
   console.log('dirname = ',__dirname);
-  console.log(`server running at http://localhost:${port}/`);
+  console.log(`server running at http://${host}:${port}/`);
 });
