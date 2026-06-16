@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         send_payload("POST",'/dothingtoo');
       case "gettest":
         console.log('gettest pressed');
-        send_payload("GET",'/getest');
+        send_payload("GET",'/api/getest');
         break;
       default:
         break;

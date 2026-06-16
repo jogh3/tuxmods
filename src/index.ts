@@ -1,7 +1,9 @@
+#! /usr/bin/env node
 import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import * as os from 'os'
 
 import * as get_funcs from './get_funcs.js';
 import * as post_funcs from './post_funcs.js';
@@ -15,6 +17,8 @@ var host: string = 'localhost';
 function errorhandle(err: any): string {
   return "";
 }
+
+const config_dir = path.join(os.homedir(), '.config', 'tuxmods');
 
 const filetypes: Record<string, string> = {
   '.html': 'text/html',
@@ -41,6 +45,19 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
   const conttype: string = filetypes[filetype] || "text/plain";
   const method: string = req.method || 'GET';
   if (method === 'GET'){
+    if (safe_url.startsWith('/api/')) {
+      const command: string = safe_url.split('?')[0]!.split('/').pop() || '';
+      const handler: any = get_funcs.getroutes[command];
+      
+      if (handler) {
+        // you will want to pass req and res to your handler so it can send data back
+        handler(req, res); 
+      } else {
+        res.writeHead(404);
+        res.end('api endpoint not found');
+      }
+      return; // exit early so we don't accidentally serve files below
+    }
     if (filetype == ''){
       const index_path: string = path.join(publicdir, 'index.html');
       fs.readFile(index_path, (err: any, index_data: Buffer) => {
