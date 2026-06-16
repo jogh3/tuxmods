@@ -1,5 +1,5 @@
 
-export const postroutes: Record<string, () => void> = {
+export const postroutes: Record<string,any> = {
   '/dothing': dothing,
   '/dothingtoo': dothingtoo
 };
