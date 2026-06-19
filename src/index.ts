@@ -3,7 +3,7 @@ import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import * as os from 'os'
+import * as os from 'os';
 
 import * as get_funcs from './get_funcs.js';
 import * as post_funcs from './post_funcs.js';
@@ -11,83 +11,96 @@ import * as post_funcs from './post_funcs.js';
 const __filename: string = fileURLToPath(import.meta.url);
 const __dirname: string = path.dirname(__filename);
 
-var port: number = 6942;
-var host: string = 'localhost';
+const port: number = 6942;
+const host: string = 'localhost';
 
-function errorhandle(err: any): string {
-  return "";
-}
+export const config_dir = path.join(os.homedir(), '.config', 'tuxmods');
+const public_dir: string = path.join(__dirname, '..', 'public');
 
-const config_dir = path.join(os.homedir(), '.config', 'tuxmods');
-
-const filetypes: Record<string, string> = {
+export const file_types: Record<string, string> = {
   '.html': 'text/html',
   '.css': 'text/css',
   '.js': 'text/javascript',
-  '.json': 'application/json', // note: json is usually application/json
+  '.json': 'application/json',
   '.ico': 'image/x-icon',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml'
 };
 
-const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-  const safe_url: string = req.url || '/'; 
-  const publicdir: string = path.join(__dirname,'..', 'public');
-  const requestedfilepath: string = path.join(publicdir, safe_url === '/' ? '/index.html' : safe_url);
-  const absolutepath: string = path.resolve(requestedfilepath);
-  const safesecurityzone: string = path.resolve(publicdir);
-  if (!absolutepath.startsWith(safesecurityzone)) {
-    res.writeHead(403); // 403 means forbidden
+export function check_directory_traverse(requested_path : string, acceptable: string) : boolean{
+  const absolute_path: string = path.resolve(requested_path);
+  const safe_zone: string = path.resolve(acceptable);
+
+  if (!absolute_path.startsWith(safe_zone)) {
+    return true;
+  }
+  return false;
+}
+
+// separated static file and spa fallback logic
+function serve_static(req: http.IncomingMessage, res: http.ServerResponse, safe_url: string) {
+  const requested_path: string = path.join(public_dir, safe_url === '/' ? '/index.html' : safe_url);
+
+  if (check_directory_traverse(requested_path, public_dir)) {
+    res.writeHead(403);
     return res.end("nice try, but you don't fuckle with shuckle");
   }
-  const filetype: string = path.extname(requestedfilepath);
-  const conttype: string = filetypes[filetype] || "text/plain";
-  const method: string = req.method || 'GET';
-  if (method === 'GET'){
-    if (safe_url.startsWith('/api/')) {
-      const command: string = safe_url.split('?')[0]!.split('/').pop() || '';
-      const handler: any = get_funcs.getroutes[command];
-      
-      if (handler) {
-        // you will want to pass req and res to your handler so it can send data back
-        handler(req, res); 
-      } else {
-        res.writeHead(404);
-        res.end('api endpoint not found');
-      }
-      return; // exit early so we don't accidentally serve files below
-    }
-    if (filetype == ''){
-      const index_path: string = path.join(publicdir, 'index.html');
-      fs.readFile(index_path, (err: any, index_data: Buffer) => {
-        if (err) {
-          res.writeHead(500);
-          return res.end('error loading index');
-        }
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        return res.end(index_data);
-      })
-    } else {
-    fs.readFile(requestedfilepath, (err: any, filedata: Buffer) => {
+
+  const ext: string = path.extname(requested_path);
+  const content_type: string = file_types[ext] || "text/plain";
+
+  // spa fallback for frontend routes
+  if (ext === '') {
+    const index_path: string = path.join(public_dir, 'index.html');
+    fs.readFile(index_path, (err: any, data: Buffer) => {
       if (err) {
         res.writeHead(500);
-        return res.end('error loading page');
+        return res.end('error loading index');
       }
-      res.writeHead(200, {'Content-Type': conttype});
-      res.end(filedata);
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      return res.end(data);
     });
-  }}
-  if(method === 'POST'){
-    const handler: any = post_funcs.postroutes[safe_url];
-    if (handler){
-      handler();
-    } else {
-      console.log('invalid post req');
-    }
-    res.writeHead(204);
-    res.end();
     return;
+  }
+  // standard static file serving
+  fs.readFile(requested_path, (err: any, data: Buffer) => {
+    if (err) {
+      res.writeHead(404);
+      return res.end('file not found');
+    }
+    res.writeHead(200, { 'Content-Type': content_type });
+    res.end(data);
+  });
+}
+
+// main traffic cop
+const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
+  const safe_url: string = req.url || '/';
+  const method: string = req.method || 'GET';
+
+  // 1. intercept api calls first
+  if (safe_url.startsWith('/api/')) {
+    const command: string = safe_url.split('?')[0]!.split('/').pop() || '';
+    
+    if (method === 'GET') {
+      const handler: any = get_funcs.getroutes[command];
+      if (handler) return handler(req, res);
+    } else if (method === 'POST') {
+      const handler: any = post_funcs.postroutes[command]; 
+      if (handler) return handler(req, res); 
+    }
+
+    res.writeHead(404);
+    return res.end('api endpoint not found');
+  }
+
+  // 2. if not an api call, handle the frontend requests
+  if (method === 'GET') {
+    serve_static(req, res, safe_url);
+  } else {
+    res.writeHead(405); 
+    res.end('method not allowed');
   }
 });
 

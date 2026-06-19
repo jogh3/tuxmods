@@ -69,3 +69,28 @@ h1,h2, p, li, pre {
 #top-bar {
   border-bottom: 5px ridge black;
 }
+.mod-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 5px;
+  border-bottom: 1px dashed #5a5761; /* optional, just separates the mods visually */
+}
+
+.mod-spacer {
+  flex: 1; /* this is the magic part that fills the empty space */
+}
+
+.mod-name {
+  font-size: 18px;
+}
+
+.mod-index {
+  margin-right: 15px; /* keeps the load order from touching the button */
+  color: #a271f7;
+}
+.toggle-btn {
+  width: 6%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}

@@ -2,3 +2,5 @@ node_modules
 build
 *.sh
 res and req format.txt
+save.txt
+*.pdf
