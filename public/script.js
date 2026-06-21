@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebar_buttons = {
     "home": load_main,
     "settings": load_settings,
-    "mod_list": load_mod_list
+    "mod_list": load_mod_list,
+    "load_order": load_load_order
   }
   console.log(window.location.pathname);
   const raw_path = window.location.pathname;
@@ -144,4 +145,14 @@ async function load_mod_list(is_pop_state = false) {
       ${formatted_mods}
     </ul>
   `;
+}
+function load_load_order(is_pop_state = false) {
+  console.log("changing to load order");
+  let main_body = document.getElementById("main_body");
+  main_body.innerHTML = `
+    <h1> load order </h1>
+  `;
+  if (!is_pop_state){
+    history.pushState({page: "load_order"}, "", "/load_order");
+  }
 }

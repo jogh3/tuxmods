@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import * as index from './index.js';
+import * as cg_mangr from './config_manager.ts';
 
 export const getroutes: Record<string,any> = {
   'get_mod_list': get_mod_list
@@ -47,4 +48,18 @@ function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse) {
     res.writeHead(200, { 'Content-Type': index.file_types[".json"] });
     res.end(data);
   })
+}
+
+export function get_staging_items(staging_dir: string): Record<string,boolean> {
+  dir_items: Record<string,boolean> = {};
+  allfiles = fs.readdirSync(staging_dir,{withFiletypes: true});
+  allfiles.forEach(item => {
+    if (item.isDirectory()){
+      dir_items[item.name] = true;
+    }
+  });
+  return dir_items;
+}
+function sync_profile(profile_info:any, disk_items: Record<string,boolean>): any {
+  
 }
