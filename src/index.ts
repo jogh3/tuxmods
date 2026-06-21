@@ -8,15 +8,17 @@ import * as os from 'os';
 import * as get_funcs from './get_funcs.js';
 import * as post_funcs from './post_funcs.js';
 
-const __filename: string = fileURLToPath(import.meta.url);
-const __dirname: string = path.dirname(__filename);
+const __filename: string = fileURLToPath(import.meta.url); //setting the filename as different import method
+const __dirname: string = path.dirname(__filename); // setting the filename as different import method
 
-const port: number = 6942;
+// port and host, allow to change with arguments later
+const port: number = 6942; 
 const host: string = 'localhost';
 
 export const config_dir = path.join(os.homedir(), '.config', 'tuxmods');
-const public_dir: string = path.join(__dirname, '..', 'public');
+const public_dir: string = path.join(__dirname, '..', 'public'); // path to the frontend of the daemon
 
+// record for what to display for each file type that could be served
 export const file_types: Record<string, string> = {
   '.html': 'text/html',
   '.css': 'text/css',
@@ -28,6 +30,7 @@ export const file_types: Record<string, string> = {
   '.svg': 'image/svg+xml'
 };
 
+// this is to check for directory traversal in the requested url for safety purposes
 export function check_directory_traverse(requested_path : string, acceptable: string) : boolean{
   const absolute_path: string = path.resolve(requested_path);
   const safe_zone: string = path.resolve(acceptable);
@@ -104,6 +107,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
   }
 });
 
+//opening the actual server
 server.listen(port, host, () => {
   console.log('starting tuxmods')
   console.log('[ .  . ]');

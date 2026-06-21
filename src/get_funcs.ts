@@ -9,6 +9,7 @@ export const getroutes: Record<string,any> = {
   'get_mod_list': get_mod_list
 };
 
+// parses api request parameters, into each bit
 export function parse_parameters (rawurl: string) : Record<string,string> {
   let querypart: string = rawurl.split('?')[1]!;
   if (!rawurl.includes('?')) return {};
@@ -16,6 +17,7 @@ export function parse_parameters (rawurl: string) : Record<string,string> {
   return Object.fromEntries(params.entries());
 }
 
+// gets the list of mods from the requested game and profile and whatever
 function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse) {
   const requrl: string = req.url || '';
   if (!requrl) {
@@ -36,7 +38,7 @@ function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse) {
     res.writeHead(404);
     res.end("no profile parameter");
   }
-  let filename: string = params["profile"]+'.json';
+  let filename: string = params["profile"]+'.json'; // temp part ----------------------------------
   const config_file_loc: string = path.join(index.config_dir,game,filename);
 
   fs.readFile(config_file_loc, (err: any, data: Buffer) => {
@@ -50,6 +52,7 @@ function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse) {
   })
 }
 
+// reads the requested game's staging directory
 export function get_staging_items(staging_dir: string): Record<string,boolean> {
   dir_items: Record<string,boolean> = {};
   allfiles = fs.readdirSync(staging_dir,{withFiletypes: true});
@@ -60,6 +63,12 @@ export function get_staging_items(staging_dir: string): Record<string,boolean> {
   });
   return dir_items;
 }
+
 function sync_profile(profile_info:any, disk_items: Record<string,boolean>): any {
+  
+}
+
+// gets the entire config file
+function get_config(config_file_loc: string) {
   
 }
