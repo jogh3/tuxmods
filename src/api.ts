@@ -8,7 +8,9 @@ import * as cg_mangr from './config_manager.ts';
 export const getroutes: Record<string,any> = {
   'get_mod_list': get_mod_list
 };
-
+export const postroutes: Record<string,any> = {
+  '':
+};
 // parses api request parameters, into each bit
 export function parse_parameters (rawurl: string) : Record<string,string> {
   let querypart: string = rawurl.split('?')[1]!;
