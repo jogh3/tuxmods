@@ -15,7 +15,8 @@ const __dirname: string = path.dirname(__filename); // setting the filename as d
 const port: number = 6942; 
 const host: string = 'localhost';
 
-export const config_dir = path.join(os.homedir(), '.config', 'tuxmods');
+export const config_dir: string = path.join(os.homedir(), '.config', 'tuxmods');
+export const config_file: string = path.join(config_dir, 'config.json');
 const public_dir: string = path.join(__dirname, '..', 'public'); // path to the frontend of the daemon
 
 // record for what to display for each file type that could be served
