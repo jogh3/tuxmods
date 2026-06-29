@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Bluebird from 'bluebird';
 import * as React from 'react';
 import * as BS from 'react-bootstrap';

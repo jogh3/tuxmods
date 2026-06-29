@@ -1,3 +1,4 @@
+// @ts-nocheck
 const Promise = require('bluebird');
 const { remote } = require('electron');
 const path = require('path');

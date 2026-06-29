@@ -1,0 +1,1 @@
+{"version":3,"file":"CompatibilityIcon.d.ts","sourceRoot":"","sources":["CompatibilityIcon.tsx"],"names":[],"mappings":"AACA,OAAO,EAAW,KAAK,EAAE,MAAM,YAAY,CAAC;AAG5C,MAAM,WAAW,uBAAuB;IACtC,CAAC,EAAE,KAAK,CAAC,SAAS,CAAC;IACnB,GAAG,EAAE,KAAK,CAAC,IAAI,CAAC;IAChB,UAAU,EAAE,OAAO,CAAC;CACrB;AAaD,iBAAS,iBAAiB,CAAC,KAAK,EAAE,uBAAuB,OA8BxD;AAED,eAAe,iBAAiB,CAAC"}

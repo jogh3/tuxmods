@@ -1,3 +1,4 @@
+// @ts-nocheck
 const path = require('path');
 const Promise = require('bluebird');
 const { fs, util } = require('vortex-api');

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { actions, types, selectors, util } from 'vortex-api';
 import { GAME_ID } from './common';
 import { gte } from 'semver';

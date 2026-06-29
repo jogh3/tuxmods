@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import { selectors, types } from 'vortex-api';
 

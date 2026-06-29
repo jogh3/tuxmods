@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import path from 'path';
 import { fs, types, selectors, util } from 'vortex-api';

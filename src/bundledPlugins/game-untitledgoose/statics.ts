@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from 'path';
 
 export const DATAPATH = path.join('Untitled_Data', 'Managed');

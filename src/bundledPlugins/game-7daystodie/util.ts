@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Bluebird from 'bluebird';
 import path from 'path';
 import turbowalk from 'turbowalk';

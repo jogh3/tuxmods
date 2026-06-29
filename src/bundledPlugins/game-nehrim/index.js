@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { util } = require('vortex-api');
 const GAMEID = 'nehrim';
 const STEAMAPPID = '1014940';

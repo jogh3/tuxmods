@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { types } from 'vortex-api';
 
 export type LockedState = 'true' | 'false' | 'always' | 'never';

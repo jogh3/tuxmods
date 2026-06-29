@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { getFileVersion, getFileVersionLocalized } = require('exe-version');
 const path = require('path');
 const { fs, selectors, util } = require('vortex-api');

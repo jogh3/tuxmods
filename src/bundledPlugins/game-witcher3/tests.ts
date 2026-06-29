@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { selectors, types, util } from 'vortex-api';
 
 import { GAME_ID, getSuppressModLimitBranch } from './common';

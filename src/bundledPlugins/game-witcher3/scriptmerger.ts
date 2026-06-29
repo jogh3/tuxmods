@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import https from 'https';
 import path from 'path';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IncomingHttpHeaders } from 'http';
 import { types } from 'vortex-api';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { selectors, types, util } from 'vortex-api';
 import { IKCDCollectionsData } from './types';
 

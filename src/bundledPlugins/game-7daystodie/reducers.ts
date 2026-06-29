@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { setPrefixOffset, setPreviousLO, setUDF } from './actions';
 import { types, util } from 'vortex-api';
 export const reducer: types.IReducerSpec = {

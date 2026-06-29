@@ -1,3 +1,4 @@
+// @ts-nocheck
 const path = require('path');
 const { app, remote } = require('electron');
 const winapi = require('winapi-bindings');

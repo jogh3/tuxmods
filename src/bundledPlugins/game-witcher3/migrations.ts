@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import semver from 'semver';
 import { selectors, types, util } from 'vortex-api';

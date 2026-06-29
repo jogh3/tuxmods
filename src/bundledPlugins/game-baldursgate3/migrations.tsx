@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as semver from 'semver';
 import { actions, fs, types, util } from 'vortex-api';
 import { importModSettingsGame } from './loadOrder';

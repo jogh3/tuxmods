@@ -1,21 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getModId = exports.genCollectionLoadOrder = exports.isModInCollection = exports.isValidMod = void 0;
-const vortex_api_1 = require("vortex-api");
-const util_1 = require("../util");
-function isValidMod(mod) {
+import { types, util } from 'vortex-api';
+import { transformId } from '../util';
+export function isValidMod(mod) {
     return (mod !== undefined)
         && (mod.type !== 'collection');
 }
-exports.isValidMod = isValidMod;
-function isModInCollection(collectionMod, mod) {
+export function isModInCollection(collectionMod, mod) {
     if (collectionMod.rules === undefined) {
         return false;
     }
-    return collectionMod.rules.find(rule => vortex_api_1.util.testModReference(mod, rule.reference)) !== undefined;
+    return collectionMod.rules.find(rule => util.testModReference(mod, rule.reference)) !== undefined;
 }
-exports.isModInCollection = isModInCollection;
-function genCollectionLoadOrder(loadOrder, mods, collection) {
+export function genCollectionLoadOrder(loadOrder, mods, collection) {
     const sortedMods = (loadOrder || []).filter(loId => {
         const modId = getModId(mods, loId);
         return (collection !== undefined)
@@ -24,9 +19,7 @@ function genCollectionLoadOrder(loadOrder, mods, collection) {
     });
     return sortedMods;
 }
-exports.genCollectionLoadOrder = genCollectionLoadOrder;
-function getModId(mods, loId) {
-    return Object.keys(mods).find(modId => (0, util_1.transformId)(modId) === loId);
+export function getModId(mods, loId) {
+    return Object.keys(mods).find(modId => transformId(modId) === loId);
 }
-exports.getModId = getModId;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidXRpbC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbInV0aWwudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBQUEsMkNBQXlDO0FBRXpDLGtDQUFzQztBQUV0QyxTQUFnQixVQUFVLENBQUMsR0FBZTtJQUN4QyxPQUFPLENBQUMsR0FBRyxLQUFLLFNBQVMsQ0FBQztXQUNyQixDQUFDLEdBQUcsQ0FBQyxJQUFJLEtBQUssWUFBWSxDQUFDLENBQUM7QUFDbkMsQ0FBQztBQUhELGdDQUdDO0FBRUQsU0FBZ0IsaUJBQWlCLENBQUMsYUFBeUIsRUFBRSxHQUFlO0lBQzFFLElBQUksYUFBYSxDQUFDLEtBQUssS0FBSyxTQUFTLEVBQUU7UUFDckMsT0FBTyxLQUFLLENBQUM7S0FDZDtJQUVELE9BQU8sYUFBYSxDQUFDLEtBQUssQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLEVBQUUsQ0FDckMsaUJBQUksQ0FBQyxnQkFBZ0IsQ0FBQyxHQUFHLEVBQUUsSUFBSSxDQUFDLFNBQVMsQ0FBQyxDQUFDLEtBQUssU0FBUyxDQUFDO0FBQzlELENBQUM7QUFQRCw4Q0FPQztBQUVELFNBQWdCLHNCQUFzQixDQUFDLFNBQW1CLEVBQ25CLElBQXFDLEVBQ3JDLFVBQXVCO0lBQzVELE1BQU0sVUFBVSxHQUFHLENBQUMsU0FBUyxJQUFJLEVBQUUsQ0FBQyxDQUFDLE1BQU0sQ0FBQyxJQUFJLENBQUMsRUFBRTtRQUNqRCxNQUFNLEtBQUssR0FBRyxRQUFRLENBQUMsSUFBSSxFQUFFLElBQUksQ0FBQyxDQUFDO1FBQ25DLE9BQU8sQ0FBQyxVQUFVLEtBQUssU0FBUyxDQUFDO1lBQy9CLENBQUMsQ0FBQyxVQUFVLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUFDLElBQUksQ0FBQyxpQkFBaUIsQ0FBQyxVQUFVLEVBQUUsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUFDLENBQUM7WUFDekUsQ0FBQyxDQUFDLFVBQVUsQ0FBQyxJQUFJLENBQUMsS0FBSyxDQUFDLENBQUMsQ0FBQztJQUM5QixDQUFDLENBQUMsQ0FBQztJQUNILE9BQU8sVUFBVSxDQUFDO0FBQ3BCLENBQUM7QUFWRCx3REFVQztBQUVELFNBQWdCLFFBQVEsQ0FBQyxJQUFxQyxFQUFFLElBQVk7SUFDMUUsT0FBTyxNQUFNLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDLElBQUksQ0FBQyxLQUFLLENBQUMsRUFBRSxDQUFDLElBQUEsa0JBQVcsRUFBQyxLQUFLLENBQUMsS0FBSyxJQUFJLENBQUMsQ0FBQztBQUN0RSxDQUFDO0FBRkQsNEJBRUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyB0eXBlcywgdXRpbCB9IGZyb20gJ3ZvcnRleC1hcGknO1xyXG5cclxuaW1wb3J0IHsgdHJhbnNmb3JtSWQgfSBmcm9tICcuLi91dGlsJztcclxuXHJcbmV4cG9ydCBmdW5jdGlvbiBpc1ZhbGlkTW9kKG1vZDogdHlwZXMuSU1vZCkge1xyXG4gIHJldHVybiAobW9kICE9PSB1bmRlZmluZWQpXHJcbiAgICAmJiAobW9kLnR5cGUgIT09ICdjb2xsZWN0aW9uJyk7XHJcbn1cclxuXHJcbmV4cG9ydCBmdW5jdGlvbiBpc01vZEluQ29sbGVjdGlvbihjb2xsZWN0aW9uTW9kOiB0eXBlcy5JTW9kLCBtb2Q6IHR5cGVzLklNb2QpIHtcclxuICBpZiAoY29sbGVjdGlvbk1vZC5ydWxlcyA9PT0gdW5kZWZpbmVkKSB7XHJcbiAgICByZXR1cm4gZmFsc2U7XHJcbiAgfVxyXG5cclxuICByZXR1cm4gY29sbGVjdGlvbk1vZC5ydWxlcy5maW5kKHJ1bGUgPT5cclxuICAgIHV0aWwudGVzdE1vZFJlZmVyZW5jZShtb2QsIHJ1bGUucmVmZXJlbmNlKSkgIT09IHVuZGVmaW5lZDtcclxufVxyXG5cclxuZXhwb3J0IGZ1bmN0aW9uIGdlbkNvbGxlY3Rpb25Mb2FkT3JkZXIobG9hZE9yZGVyOiBzdHJpbmdbXSxcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbW9kczogeyBbbW9kSWQ6IHN0cmluZ106IHR5cGVzLklNb2QgfSxcclxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29sbGVjdGlvbj86IHR5cGVzLklNb2QpOiBzdHJpbmdbXSB7XHJcbiAgY29uc3Qgc29ydGVkTW9kcyA9IChsb2FkT3JkZXIgfHwgW10pLmZpbHRlcihsb0lkID0+IHtcclxuICAgIGNvbnN0IG1vZElkID0gZ2V0TW9kSWQobW9kcywgbG9JZCk7XHJcbiAgICByZXR1cm4gKGNvbGxlY3Rpb24gIT09IHVuZGVmaW5lZClcclxuICAgICAgPyBpc1ZhbGlkTW9kKG1vZHNbbW9kSWRdKSAmJiAoaXNNb2RJbkNvbGxlY3Rpb24oY29sbGVjdGlvbiwgbW9kc1ttb2RJZF0pKVxyXG4gICAgICA6IGlzVmFsaWRNb2QobW9kc1ttb2RJZF0pO1xyXG4gIH0pO1xyXG4gIHJldHVybiBzb3J0ZWRNb2RzO1xyXG59XHJcblxyXG5leHBvcnQgZnVuY3Rpb24gZ2V0TW9kSWQobW9kczogeyBbbW9kSWQ6IHN0cmluZ106IHR5cGVzLklNb2QgfSwgbG9JZDogc3RyaW5nKSB7XHJcbiAgcmV0dXJuIE9iamVjdC5rZXlzKG1vZHMpLmZpbmQobW9kSWQgPT4gdHJhbnNmb3JtSWQobW9kSWQpID09PSBsb0lkKTtcclxufVxyXG4iXX0=
+//# sourceMappingURL=util.js.map

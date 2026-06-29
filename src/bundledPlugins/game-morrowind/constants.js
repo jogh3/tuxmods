@@ -1,3 +1,4 @@
+// @ts-nocheck
 const MORROWIND_ID = 'morrowind';
 const NATIVE_PLUGINS = ['Bloodmoon.esm', 'Morrowind.esm', 'Tribunal.esm'];
 

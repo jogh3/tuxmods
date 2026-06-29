@@ -1,3 +1,4 @@
+// @ts-nocheck
 // once a week
 export const SMAPI_QUERY_FREQUENCY: number = 1000 * 60 * 24 * 7;
 

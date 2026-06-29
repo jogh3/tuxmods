@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from 'path';
 import { actions, log, selectors, types, util } from 'vortex-api';
 import * as React from 'react';

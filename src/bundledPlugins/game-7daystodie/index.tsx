@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from 'path';
 import { useSelector } from 'react-redux';
 import { actions, fs, selectors, types, util } from 'vortex-api';

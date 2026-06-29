@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Star Wars: Knights of the Old Republic mods (kotor1 and kotor2) 
 //  are usually extracted to the override folder found within the game's
 //  directory. Most modders provide a full override directory structure

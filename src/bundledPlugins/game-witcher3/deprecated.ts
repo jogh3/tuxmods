@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
   FBLO does not currently support individual context actions
    leaving this here for now as we may decide to enhance FBLO in

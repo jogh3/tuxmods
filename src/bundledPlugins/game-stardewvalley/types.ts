@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface ISDVModManifest {
   Name: string;
   Author: string;

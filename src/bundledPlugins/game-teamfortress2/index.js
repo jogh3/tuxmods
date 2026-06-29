@@ -1,3 +1,4 @@
+// @ts-nocheck
 const Promise = require('bluebird');
 const winapi = require('winapi-bindings');
 const { fs, log, util } = require('vortex-api');

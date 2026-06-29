@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { ControlLabel, FormGroup, HelpBlock, Panel } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';

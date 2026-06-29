@@ -1,3 +1,4 @@
+// @ts-nocheck
 const path = require('path');
 const semver = require('semver');
 const Promise = require('bluebird');

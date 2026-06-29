@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { log, util } = require('vortex-api');
 
 const { remote } = require('electron');

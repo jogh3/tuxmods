@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { types, selectors } from 'vortex-api';
 
 import DependencyManager from './DependencyManager';

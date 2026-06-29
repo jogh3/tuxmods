@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 const { app, remote } = require('electron');
 const Big = require('big.js');

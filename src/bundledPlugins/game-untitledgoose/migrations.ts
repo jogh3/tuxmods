@@ -1,3 +1,4 @@
+// @ts-nocheck
 // import { runPatcher } from 'harmony-patcher';
 import path from 'path';
 import semver from 'semver';

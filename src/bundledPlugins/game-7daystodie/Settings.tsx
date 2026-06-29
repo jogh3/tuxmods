@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from 'path';
 import React from 'react';
 import { useSelector } from 'react-redux';

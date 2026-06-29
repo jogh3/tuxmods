@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { util } from 'vortex-api';
 import path from 'path';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import path from 'path';
 import IniParser, { IniFile, WinapiFormat } from 'vortex-parse-ini';

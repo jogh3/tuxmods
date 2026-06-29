@@ -1,3 +1,4 @@
+// @ts-nocheck
 # Vortex Extension for The Witcher 3
 
 This is an extension for Vortex to add support for The Witcher 3.

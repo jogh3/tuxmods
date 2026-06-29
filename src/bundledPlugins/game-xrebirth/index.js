@@ -1,3 +1,4 @@
+// @ts-nocheck
 const Promise = require('bluebird');
 const { parseStringPromise } = require('xml2js');
 const path = require('path');

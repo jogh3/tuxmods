@@ -5,8 +5,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import * as os from 'os';
 
-import * as get_funcs from './get_funcs.js';
-import * as post_funcs from './post_funcs.js';
+import * as api from './api.js';
 
 const __filename: string = fileURLToPath(import.meta.url); //setting the filename as different import method
 const __dirname: string = path.dirname(__filename); // setting the filename as different import method
@@ -32,7 +31,7 @@ export const file_types: Record<string, string> = {
 };
 
 // this is to check for directory traversal in the requested url for safety purposes
-export function check_directory_traverse(requested_path : string, acceptable: string) : boolean{
+export function is_directory_traversal(requested_path : string, acceptable: string) : boolean{
   const absolute_path: string = path.resolve(requested_path);
   const safe_zone: string = path.resolve(acceptable);
 
@@ -88,11 +87,21 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
     const command: string = safe_url.split('?')[0]!.split('/').pop() || '';
     
     if (method === 'GET') {
-      const handler: any = get_funcs.getroutes[command];
-      if (handler) return handler(req, res);
+      const handler: any = api.getroutes[command];
+      if (handler) {
+        return handler(req, res);
+      } else {
+          res.writeHead(404);
+          return res.end('api endpoint not found');
+      }
     } else if (method === 'POST') {
-      const handler: any = post_funcs.postroutes[command]; 
-      if (handler) return handler(req, res); 
+      const handler: any = api.postroutes[command]; 
+      if (handler){ 
+        return handler(req, res); 
+      } else {
+          res.writeHead(404);
+          return res.end('api endpoint not found');
+      }
     }
 
     res.writeHead(404);

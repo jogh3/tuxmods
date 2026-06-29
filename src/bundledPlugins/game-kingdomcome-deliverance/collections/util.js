@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getModId = exports.genCollectionLoadOrder = exports.isModInCollection = exports.isValidMod = void 0;

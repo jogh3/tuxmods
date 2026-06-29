@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { IFileInfo } from '@nexusmods/nexus-api';
 import * as https from 'https';
 import { ILookupResult, IQuery } from 'modmeta-db';

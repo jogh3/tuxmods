@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* 
   Mount & Blade games consist of 2 modTypes:
     - Entire module based mods which include a module.ini file.

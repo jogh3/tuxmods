@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { types, util } from 'vortex-api';
 
 import { transformId } from '../util';

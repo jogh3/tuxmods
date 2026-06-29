@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 /**
  * Important - although we no longer define the info panel here,

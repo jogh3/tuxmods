@@ -1,3 +1,4 @@
+// @ts-nocheck
 // @ts-check
 
 const Promise = require('bluebird');

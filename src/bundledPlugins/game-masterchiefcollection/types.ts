@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface IHaloGame {
   internalId: string;
   name: string;

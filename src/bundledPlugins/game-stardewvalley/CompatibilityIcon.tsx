@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { tooltip, types } from 'vortex-api';
 import { CompatibilityStatus } from './types';

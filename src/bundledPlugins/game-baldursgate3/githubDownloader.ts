@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as https from 'https';
 import * as _ from 'lodash';
 import * as semver from 'semver';

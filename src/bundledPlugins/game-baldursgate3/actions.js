@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setBG3ExtensionVersion = exports.settingsWritten = exports.setPlayerProfile = exports.setMigration = exports.setAutoExportLoadOrder = void 0;

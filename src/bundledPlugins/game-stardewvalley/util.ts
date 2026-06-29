@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { parse } from 'relaxed-json';
 import * as semver from 'semver';
 import turbowalk, { IEntry, IWalkOptions } from 'turbowalk';

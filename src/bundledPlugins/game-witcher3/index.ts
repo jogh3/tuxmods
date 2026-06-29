@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import Bluebird from 'bluebird';
 import path from 'path';

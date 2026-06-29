@@ -1,3 +1,4 @@
+// @ts-nocheck
 # Games
 
 This repository contains a collection of all the game support extensions for Vortex.

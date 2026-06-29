@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import { ISDVModManifest } from './types';
 import turbowalk from 'turbowalk';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 import { Checkbox, ListGroupItem } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';

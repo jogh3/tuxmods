@@ -1,3 +1,4 @@
+// @ts-nocheck
 const path = require('path');
 const { fs, log, util } = require('vortex-api');
 

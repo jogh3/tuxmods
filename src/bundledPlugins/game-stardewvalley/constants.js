@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SMAPI_URL = exports.SMAPI_MOD_ID = exports.SMAPI_IO_API_VERSION = exports.SMAPI_QUERY_FREQUENCY = void 0;

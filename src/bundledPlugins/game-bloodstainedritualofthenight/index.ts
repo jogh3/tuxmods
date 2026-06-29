@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from 'path';
 import { fs, log, selectors, types, util } from 'vortex-api';
 

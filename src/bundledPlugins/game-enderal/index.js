@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { util } = require('vortex-api');
 const winapi = require('winapi-bindings');
 

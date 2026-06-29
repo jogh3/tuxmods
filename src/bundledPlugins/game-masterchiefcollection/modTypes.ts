@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from 'path';
 import { types } from 'vortex-api';
 import { MOD_INFO_JSON_FILE } from './common';

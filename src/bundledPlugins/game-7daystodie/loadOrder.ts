@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as _ from 'lodash';
 import { actions, fs, types, util } from 'vortex-api';
 

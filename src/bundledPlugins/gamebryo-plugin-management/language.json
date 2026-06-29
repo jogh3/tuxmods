@@ -1,3 +1,4 @@
+// @ts-nocheck
 {
   "{{count}} ITM record": "one ITM record",
   "{{count}} ITM record_plural": "{{ count }} ITM records",

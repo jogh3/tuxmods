@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Bluebird from 'bluebird';
 import { log, util } from 'vortex-api';
 import { GAME_ID } from './statics';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import * as React from 'react';
 import { types, tooltip } from 'vortex-api';

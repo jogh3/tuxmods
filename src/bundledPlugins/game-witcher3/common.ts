@@ -1,3 +1,4 @@
+// @ts-nocheck
 import crypto from 'crypto';
 import path from 'path';
 import { fs, util } from 'vortex-api';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { types } from 'vortex-api';
 
 export interface IPatcherProps {

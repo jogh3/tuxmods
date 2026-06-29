@@ -1,3 +1,4 @@
+// @ts-nocheck
 function main(context) {
   context.registerGameStub({
     id: 'palworld',

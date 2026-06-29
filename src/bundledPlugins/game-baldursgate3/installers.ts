@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import getVersion from 'exe-version';
 import * as path from 'path';

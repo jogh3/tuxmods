@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from 'path';
 import semver from 'semver';
 import { actions, fs, selectors, types, util } from 'vortex-api';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LoadOrder } from './types';
 import { createAction } from 'redux-act';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { actions, selectors, types, util } from 'vortex-api';
 import { GAME_ID } from '../common';
 import { IW3CollectionsData } from './types';

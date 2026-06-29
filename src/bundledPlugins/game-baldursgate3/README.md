@@ -1,3 +1,4 @@
+// @ts-nocheck
 # Requirements
 
 Before we get started, this guide assumes that you have installed Baldur's Gate 3 and Vortex at their default locations. You will also need to be logged in to your Nexus Mods account in Vortex. For more information, please see [Getting Started with Vortex](/en/vortex/users/getting-started).

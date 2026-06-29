@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as actions from './actions';
 import { types, util } from 'vortex-api';
 

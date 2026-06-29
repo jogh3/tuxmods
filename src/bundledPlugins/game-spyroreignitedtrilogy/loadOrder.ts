@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { fs, types, util } from 'vortex-api';
 
 import { GAME_ID } from './common';

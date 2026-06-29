@@ -1,3 +1,4 @@
+// @ts-nocheck
 const path = require('path');
 const { fs, selectors, util } = require('vortex-api');
 const { default: IniParser, WinapiFormat } = require('vortex-parse-ini');

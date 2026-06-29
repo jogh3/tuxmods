@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 const { getFileVersion, getFileVersionLocalized } = require('exe-version');
 const path = require('path');

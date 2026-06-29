@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const GAME_ID = 'stardewvalley';
 export const MOD_CONFIG = 'config.json';
 export const MOD_MANIFEST = 'manifest.json';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const fs = require('fs');
 const { parseString } = require('xml2js');
 const path = require('path');

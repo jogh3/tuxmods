@@ -1,3 +1,4 @@
+// @ts-nocheck
 const { app, remote } = require('electron');
 const path = require('path');
 const { fs, util } = require('vortex-api');

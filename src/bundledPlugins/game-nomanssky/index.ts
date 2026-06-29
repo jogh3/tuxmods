@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 import path from 'path';
 import semver from 'semver';

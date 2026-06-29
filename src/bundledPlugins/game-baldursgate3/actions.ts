@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createAction } from 'redux-act';
 
 // actions

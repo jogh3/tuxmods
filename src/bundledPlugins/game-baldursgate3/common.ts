@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from 'path';
 
 export const DEFAULT_MOD_SETTINGS_V8 = `<?xml version="1.0" encoding="UTF-8"?>

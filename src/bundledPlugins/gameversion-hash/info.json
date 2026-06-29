@@ -1,1 +1,2 @@
+// @ts-nocheck
 {"name":"Gameversion Hash","author":"Black Tree Gaming Ltd.","version":"1.0.2","description":"An alternative to conventional game version resolution aiming to identify game version based on file hashes. This is useful when the game is in Early Access or the user facing version is not easily resolved."}

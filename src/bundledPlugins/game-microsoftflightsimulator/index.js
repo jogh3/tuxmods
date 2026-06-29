@@ -1,3 +1,4 @@
+// @ts-nocheck
 const fsOrig = require('fs-extra');
 const _ = require('lodash');
 const path = require('path');

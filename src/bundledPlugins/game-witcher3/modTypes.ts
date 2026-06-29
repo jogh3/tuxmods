@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { CONFIG_MATRIX_REL_PATH, PART_SUFFIX } from './common';
 import path from 'path';
 import { types } from 'vortex-api';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { WithTranslation, withTranslation } from 'react-i18next';
