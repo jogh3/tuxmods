@@ -34,7 +34,6 @@ export function write_game_locs(game: string, file_datas: Record<string,string>)
 }
 
 // gets the entire config file
-// inside config_manager.ts
 export function get_config(): config_format {
   init_config();
   // read synchronously so the program waits for the data
@@ -45,10 +44,27 @@ export function get_config(): config_format {
   return parsed_config;
 }
 
+// makes a new profile
+export function make_new_profile(){
+  return;
+}
+
+// change it, like load order, or added game, etc.
+export function update_profile(){
+  return;
+}
+
+// makes the default profile when adding a new game
 export function make_def_profile(){
   return;
 }
 
+// saves the profile sync from the api, to the file
+function write_profile_sync(requrl: string, profile_info: profile_format) {
+
+}
+
+// adds a game to the config file
 export function add_game(game_info: any) {
   // gotta create staging dir as well as well as a new default profile
   return;

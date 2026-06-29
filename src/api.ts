@@ -20,7 +20,9 @@ export const getroutes: Record<string,any> = {
 };
 // all post functions that can be requested
 export const postroutes: Record<string,any> = {
-  'add_game':cg_mangr.add_game
+  'add_game':cg_mangr.add_game,
+  "make_new_prof":cg_mangr.make_new_prof,
+  "update_profile":cg_mangr.update_profile
 };
 
 // parses api request parameters, into each parameter, in name:value pair
@@ -48,14 +50,16 @@ function get_profile_list(requrl: string): profile_format {
   if (!params["profile"]){
     return {}; 
   }
-  let filename: string = params["profile"]+'.json';
-  const profile_file_loc: string = path.join(index.config_dir,game,filename);
-  if (is_directory_traversal(profile_file_loc,index.config_dir)){
+  let filename: string = params["profile"]+'.json'; // gets the filename
+  const profile_file_loc: string = path.join(index.config_dir,game,filename); // gets the final profile loc
+  // simple check for directory traversal, since it is sorta a user input
+  if (is_directory_traversal(profile_file_loc,index.config_dir)){ 
     return {};
   }
+  // if there is no profile by req name, create a new one
   if (!fs.existsSync(profile_file_loc)){
     console.log("profile missing")
-    cg_mangr.make_def_profile();
+    cg_mangr.make_new_profile(); // make the profile if doesn't exist
     return {};
   }
   let raw_data: Buffer = fs.readFileSync(profile_file_loc, { flag: 'r'});
@@ -72,6 +76,7 @@ function get_profile_list(requrl: string): profile_format {
   }
 }
 
+// this checks if the mods in a profile exist in the staging directory or not
 function sync_profile(requrl: string, profile_info: profile_format): profile_format {
   let params: Record<string,string> = parse_parameters(requrl!);
   const config_file: any = cg_mangr.get_config();
@@ -86,11 +91,7 @@ function sync_profile(requrl: string, profile_info: profile_format): profile_for
   })
   return profile_json;
 }
-
-function write_profile_sync(req: http.IncomingMessage, profile_info: Buffer) {
-
-}
-
+// gets only the profile for load order shit, syncing it first
 function get_profile_info(req: http.IncomingMessage, res: http.ServerResponse) {
   let data: profile_format = get_profile_list(req.url!);
   data = sync_profile(req.url!,data)
@@ -113,6 +114,7 @@ export function get_staging_items(staging_dir: string): Record<string,boolean> {
   return dir_items;
 }
 
+// gets the mod list for displaying, merging it with the profile
 export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse) {
     let requrl: string = req.url || '';
     if (!requrl){
@@ -127,6 +129,7 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
       res.writeHead(404);
       return res.end("no valid params")
     }
+    // this section gets the staging folder
     const config_file: cg_mangr.config_format = cg_mangr.get_config();
     let game: string = params["game"]!;
     if (!game){
@@ -136,6 +139,7 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
     let staging_dir: string = config_file["games"][game]!["staging_loc"];
     let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
     const mpty = {"enabled": false, "load_index":-1,"exists": true};
+    // merges the profile with the staging items for the mod list section
     Object.keys(staging_items).forEach((key) => {
       if (profile_info[key]){
         data[key] = profile_info[key];
@@ -143,8 +147,6 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
         data[key] = mpty;
       }
     })
-    // run sync for whether a mod has been deleted from file system but is part of profile
-    // join the mod list with the profile list requested
     res.writeHead(200, { 'Content-Type': index.file_types[".json"] });
     return res.end(data);
 }
