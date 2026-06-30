@@ -63,6 +63,7 @@ function get_profile_list(requrl: string): profile_format {
     return {};
   }
   let raw_data: Buffer = fs.readFileSync(profile_file_loc, { flag: 'r'});
+  let file_str: string = raw_data.toString().trim();
   if (file_str === "") {
     return {}; 
   }
@@ -83,7 +84,7 @@ function sync_profile(requrl: string, profile_info: profile_format): profile_for
   let game: string = params["game"]!;
   let staging_dir: string = config_file["games"][game]["staging_loc"];
   let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
-  let profile_json = JSON.parse(profile_info.toString());
+  let profile_json: profile_format = {profile_info};
   Object.keys(profile_json).forEach((key: string) => {
     if(!staging_items[key]){
       profile_json[key].exists = false;
