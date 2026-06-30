@@ -45,7 +45,7 @@ export function is_directory_traversal(requested_path : string, acceptable: stri
 function serve_static(req: http.IncomingMessage, res: http.ServerResponse, safe_url: string) {
   const requested_path: string = path.join(public_dir, safe_url === '/' ? '/index.html' : safe_url);
 
-  if (is_directory_traverse(requested_path, public_dir)) {
+  if (is_directory_traversal(requested_path, public_dir)) {
     res.writeHead(403);
     return res.end("nice try, but you don't fuckle with shuckle");
   }

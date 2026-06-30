@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import * as index from './index.js';
+import * as api from './api.js'
 
 interface game_config_form{
   game_loc: string;
@@ -60,7 +61,7 @@ export function make_def_profile(){
 }
 
 // saves the profile sync from the api, to the file
-function write_profile_sync(requrl: string, profile_info: profile_format) {
+function write_profile_sync(requrl: string, profile_info: api.profile_format) {
 
 }
 

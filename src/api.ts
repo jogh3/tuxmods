@@ -21,7 +21,7 @@ export const getroutes: Record<string,any> = {
 // all post functions that can be requested
 export const postroutes: Record<string,any> = {
   'add_game':cg_mangr.add_game,
-  "make_new_prof":cg_mangr.make_new_prof,
+  "make_new_prof":cg_mangr.make_new_profile,
   "update_profile":cg_mangr.update_profile
 };
 
@@ -53,7 +53,7 @@ function get_profile_list(requrl: string): profile_format {
   let filename: string = params["profile"]+'.json'; // gets the filename
   const profile_file_loc: string = path.join(index.config_dir,game,filename); // gets the final profile loc
   // simple check for directory traversal, since it is sorta a user input
-  if (is_directory_traversal(profile_file_loc,index.config_dir)){ 
+  if (index.is_directory_traversal(profile_file_loc,index.config_dir)){ 
     return {};
   }
   // if there is no profile by req name, create a new one
@@ -80,13 +80,19 @@ function get_profile_list(requrl: string): profile_format {
 // this checks if the mods in a profile exist in the staging directory or not
 function sync_profile(requrl: string, profile_info: profile_format): profile_format {
   let params: Record<string,string> = parse_parameters(requrl!);
-  const config_file: any = cg_mangr.get_config();
+  const config_file: cg_mangr.config_format = cg_mangr.get_config();
   let game: string = params["game"]!;
-  let staging_dir: string = config_file["games"][game]["staging_loc"];
+  if (!game || !config_file.games[game]){
+    console.log("error: game not found in params or config");
+    console.log("game: ", game);
+    console.log("config_file.games[game]: ", config_file.games[game]);
+    return profile_info;
+  }
+  let staging_dir: string = config_file.games[game]!.staging_loc;
   let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
-  let profile_json: profile_format = {profile_info};
+  let profile_json: profile_format = {...profile_info};
   Object.keys(profile_json).forEach((key: string) => {
-    if(!staging_items[key]){
+    if(!staging_items[key] && profile_json[key]){
       profile_json[key].exists = false;
     }
   })
@@ -97,7 +103,7 @@ function get_profile_info(req: http.IncomingMessage, res: http.ServerResponse) {
   let data: profile_format = get_profile_list(req.url!);
   data = sync_profile(req.url!,data)
   res.writeHead(200,{'Content-Type': index.file_types[".json"]});
-  return res.end(data);
+  return res.end(JSON.stringify(data));
 }
 
 // reads the requested game's staging directory
@@ -123,7 +129,7 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
       return res.end("no requested url");
     }
     let profile_info: profile_format = get_profile_list(requrl);
-    profile_info = sync_profile(req.url!,profile_info);
+    profile_info = sync_profile(requrl,profile_info);
     let data: any = {};
     let params: Record<string,string> = parse_parameters(requrl);
     if (!params){
@@ -137,7 +143,14 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
       res.writeHead(404);
       return res.end("no game entered");
     }
-    let staging_dir: string = config_file["games"][game]!["staging_loc"];
+    if (!game || !config_file.games[game]){
+      console.log("error: game not found in params or config");
+      console.log("game: ", game);
+      console.log("config_file.games[game]: ", config_file.games[game]);
+      res.writeHead(404);
+      return res.end("invalid game selection or no game selection");
+    }
+    let staging_dir: string = config_file.games[game]!.staging_loc;
     let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
     const mpty = {"enabled": false, "load_index":-1,"exists": true};
     // merges the profile with the staging items for the mod list section
@@ -148,7 +161,12 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
         data[key] = mpty;
       }
     })
+    Object.keys(profile_info).forEach((key) => {
+      if (!data[key]) {
+        data[key] = profile_info[key];
+      }
+    })
     res.writeHead(200, { 'Content-Type': index.file_types[".json"] });
-    return res.end(data);
+    return res.end(JSON.stringify(data));
 }
 

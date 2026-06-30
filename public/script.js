@@ -141,7 +141,7 @@ async function load_mod_list(is_pop_state = false) {
   if (!is_pop_state) {
     history.pushState({ page: "mod_list" }, "", "/mod_list");
   }
-  let mod_list = await fetch_mod_list("skyrim_mods", "skyrim");
+  let mod_list = await fetch_mod_list("test_profile", "skyrim");
   if (!mod_list) {
     console.log("no mods returned");
     main_body.innerHTML += `<h2> no mods returned </h2>`;
