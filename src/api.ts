@@ -5,24 +5,30 @@ import * as path from 'path';
 import * as index from './index.js';
 import * as cg_mangr from './config_manager.js';
 
+interface master_entry {
+  load_index: number;
+  exists: boolean;
+}
+
 interface mod_entry {
   enabled: boolean;
   load_index: number;
   exists: boolean;
 }
 
-export type profile_format = Record<string,mod_entry>;
+export type master_format = Record<string,master_entry>;
+export type mod_list_format = Record<string,mod_entry>;
 
 // all get functions that can be requested
 export const getroutes: Record<string,any> = {
   'get_mod_list': get_mod_list,
-  'get_profile_info': get_profile_info
+  'get_master_info': get_master_info
 };
 // all post functions that can be requested
 export const postroutes: Record<string,any> = {
   'add_game':cg_mangr.add_game,
   "make_new_prof":cg_mangr.make_new_profile,
-  "update_profile":cg_mangr.update_profile
+  "update_master":cg_mangr.update_master
 };
 
 // parses api request parameters, into each parameter, in name:value pair
@@ -33,8 +39,8 @@ export function parse_parameters (rawurl: string) : Record<string,string> {
   return Object.fromEntries(params.entries());
 }
 
-// gets the list of mods from the requested game and profile
-function get_profile_list(requrl: string): profile_format {
+// gets the list of mods from the requested game's master_list
+function get_master_list(requrl: string): master_format {
   if (!requrl) {
     return {};
   }
@@ -47,29 +53,26 @@ function get_profile_list(requrl: string): profile_format {
   if (!game) {
     return {}; 
   }
-  if (!params["profile"]){
-    return {}; 
-  }
-  let filename: string = params["profile"]+'.json'; // gets the filename
-  const profile_file_loc: string = path.join(index.config_dir,game,filename); // gets the final profile loc
+  let filename: string = 'master_list.json'; // gets the filename
+  const master_file_loc: string = path.join(index.config_dir,game,filename); // gets the final master loc
   // simple check for directory traversal, since it is sorta a user input
-  if (index.is_directory_traversal(profile_file_loc,index.config_dir)){ 
+  if (index.is_directory_traversal(master_file_loc,index.config_dir)){ 
     return {};
   }
-  // if there is no profile by req name, create a new one
-  if (!fs.existsSync(profile_file_loc)){
-    console.log("profile missing")
-    cg_mangr.make_new_profile(); // make the profile if doesn't exist
+  // if there is no master by req name, create a new one
+  if (!fs.existsSync(master_file_loc)){
+    console.log("master missing")
+    cg_mangr.make_master(); // make the master if doesn't exist
     return {};
   }
-  let raw_data: Buffer = fs.readFileSync(profile_file_loc, { flag: 'r'});
+  let raw_data: Buffer = fs.readFileSync(master_file_loc, { flag: 'r'});
   let file_str: string = raw_data.toString().trim();
   if (file_str === "") {
     return {}; 
   }
-  // 3. parse populated profile
+  // 3. parse populated master 
   try {
-    let parsed_profile = JSON.parse(file_str) as profile_format;
+    let parsed_profile = JSON.parse(file_str) as master_format;
     return parsed_profile;
   } catch (e) {
     console.log("profile json is corrupted");
@@ -77,8 +80,8 @@ function get_profile_list(requrl: string): profile_format {
   }
 }
 
-// this checks if the mods in a profile exist in the staging directory or not
-function sync_profile(requrl: string, profile_info: profile_format): profile_format {
+// this checks if the mods in the master exist in the staging directory or not
+function sync_master(requrl: string, profile_json: master_format): master_format {
   let params: Record<string,string> = parse_parameters(requrl!);
   const config_file: cg_mangr.config_format = cg_mangr.get_config();
   let game: string = params["game"]!;
@@ -86,11 +89,10 @@ function sync_profile(requrl: string, profile_info: profile_format): profile_for
     console.log("error: game not found in params or config");
     console.log("game: ", game);
     console.log("config_file.games[game]: ", config_file.games[game]);
-    return profile_info;
+    return profile_json;
   }
   let staging_dir: string = config_file.games[game]!.staging_loc;
   let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
-  let profile_json: profile_format = {...profile_info};
   Object.keys(profile_json).forEach((key: string) => {
     if(!staging_items[key] && profile_json[key]){
       profile_json[key].exists = false;
@@ -99,9 +101,9 @@ function sync_profile(requrl: string, profile_info: profile_format): profile_for
   return profile_json;
 }
 // gets only the profile for load order shit, syncing it first
-function get_profile_info(req: http.IncomingMessage, res: http.ServerResponse) {
-  let data: profile_format = get_profile_list(req.url!);
-  data = sync_profile(req.url!,data)
+function get_master_info(req: http.IncomingMessage, res: http.ServerResponse) {
+  let data: master_format = get_master_list(req.url!);
+  data = sync_master(req.url!,data)
   res.writeHead(200,{'Content-Type': index.file_types[".json"]});
   return res.end(JSON.stringify(data));
 }
@@ -121,16 +123,15 @@ export function get_staging_items(staging_dir: string): Record<string,boolean> {
   return dir_items;
 }
 
-// gets the mod list for displaying, merging it with the profile
+// gets the mod list for displaying, merging it with the master_list
 export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse) {
     let requrl: string = req.url || '';
     if (!requrl){
       res.writeHead(404);
       return res.end("no requested url");
     }
-    let profile_info: profile_format = get_profile_list(requrl);
-    profile_info = sync_profile(requrl,profile_info);
-    let data: any = {};
+    let master_info: master_format = get_master_list(requrl);
+    master_info = sync_master(requrl,master_info);
     let params: Record<string,string> = parse_parameters(requrl);
     if (!params){
       res.writeHead(404);
@@ -152,21 +153,33 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
     }
     let staging_dir: string = config_file.games[game]!.staging_loc;
     let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
+    let data: mod_list_format = {};
     const mpty = {"enabled": false, "load_index":-1,"exists": true};
-    // merges the profile with the staging items for the mod list section
+    // merges the master with the staging items for the mod list section
     Object.keys(staging_items).forEach((key) => {
-      if (profile_info[key]){
-        data[key] = profile_info[key];
+      if (master_info[key]){
+        data[key] = {
+          enabled: true,
+          load_index: master_info[key]!.load_index,
+          exists: master_info[key]!.exists
+        };
       } else{
         data[key] = mpty;
       }
     })
-    Object.keys(profile_info).forEach((key) => {
+    Object.keys(master_info).forEach((key) => {
       if (!data[key]) {
-        data[key] = profile_info[key];
+        data[key] = {
+          exists: master_info[key]!.exists,
+          load_index: master_info[key]!.load_index,
+          enabled: true
+        };
       }
     })
     res.writeHead(200, { 'Content-Type': index.file_types[".json"] });
     return res.end(JSON.stringify(data));
 }
 
+export function apply_profile(){
+  return;
+}

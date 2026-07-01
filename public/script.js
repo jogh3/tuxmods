@@ -93,9 +93,8 @@ function load_settings(is_pop_state = false) {
   `;
   return;
 }
-async function fetch_mod_list(target_profile, target_game){
+async function fetch_mod_list(target_game){
   const params = new URLSearchParams({ // generate the api request parameters
-    profile: target_profile,
     game: target_game
   });
   console.log("sending, ", params.toString());
@@ -116,17 +115,19 @@ function build_mod_list_html(mod_data) {
   let final_html = '';
   for (const mod_key in mod_data) { // forms the mod info into a list
     const mod_info = mod_data[mod_key];
-    const button_text = mod_info.enabled ? "disable" : "enable";
-    proper_mod_key = mod_key.replace(/_/g," "); // replaces the "_" with spaces, probaly should undo, depending on later
-    // might add an invisible element to keep track of the real name of the mod, leaving the spaces for visual pleasing
+    let button_text = mod_info.enabled ? "disable" : "enable";
+    if (!mod_info.exists) {
+      button_text = "removed";
+    }
+    let proper_mod_key = mod_key.replace(/_/g," "); // replaces the "_" with spaces, probaly should undo, depending on later
     final_html += `
       <li class="mod-row">
         <span class="mod-name">${proper_mod_key}</span>
         <div class="mod-spacer"></div>
-        <span class="mod-index">load order: ${mod_info.load_index}</span>
         <button class="toggle-btn" id="toggle_${mod_key}">${button_text}</button>
       </li>
     `;
+     // <span class="mod-index">load order: ${mod_info.load_index}</span>
   }
   
   return final_html;
@@ -141,7 +142,7 @@ async function load_mod_list(is_pop_state = false) {
   if (!is_pop_state) {
     history.pushState({ page: "mod_list" }, "", "/mod_list");
   }
-  let mod_list = await fetch_mod_list("test_profile", "skyrim");
+  let mod_list = await fetch_mod_list("skyrim");
   if (!mod_list) {
     console.log("no mods returned");
     main_body.innerHTML += `<h2> no mods returned </h2>`;

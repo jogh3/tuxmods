@@ -50,18 +50,23 @@ export function make_new_profile(){
   return;
 }
 
-// change it, like load order, or added game, etc.
-export function update_profile(){
+// change the master, like load order, or added game, etc.
+export function update_master(){
   return;
 }
 
+// writes the mods to the selected profile
+export function save_to_profile(){
+
+}
+
 // makes the default profile when adding a new game
-export function make_def_profile(){
+export function make_master(){
   return;
 }
 
 // saves the profile sync from the api, to the file
-function write_profile_sync(requrl: string, profile_info: api.profile_format) {
+function write_profile_sync(requrl: string, profile_info: api.master_format) {
 
 }
 
