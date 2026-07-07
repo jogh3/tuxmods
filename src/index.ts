@@ -87,6 +87,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
     const command: string = safe_url.split('?')[0]!.split('/').pop() || '';
     
     if (method === 'GET') {
+      console.log('GET request',safe_url);
       const handler: any = api.getroutes[command];
       if (handler) {
         return handler(req, res);
@@ -95,6 +96,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
           return res.end('api endpoint not found');
       }
     } else if (method === 'POST') {
+      console.log('POST request', safe_url);
       const handler: any = api.postroutes[command]; 
       if (handler){ 
         return handler(req, res); 

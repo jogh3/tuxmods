@@ -1,6 +1,10 @@
 {
   "name": "tuxmods",
   "version": "1.0.0",
+  "main":"build/index.js",
+  "bin" : {
+    "tuxmods": "./build/index.js"
+  },
   "description": "",
   "homepage": "https://github.com/jogh3/tuxmods#readme",
   "bugs": {

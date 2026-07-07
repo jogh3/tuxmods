@@ -118,6 +118,7 @@ function build_mod_list_html(mod_data) {
     let button_text = mod_info.enabled ? "disable" : "enable";
     if (!mod_info.exists) {
       button_text = "removed";
+      mod_info.load_index = -1;
     }
     let proper_mod_key = mod_key.replace(/_/g," "); // replaces the "_" with spaces, probaly should undo, depending on later
     final_html += `

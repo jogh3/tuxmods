@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as http from 'http';
 
 import * as index from './index.js';
 import * as api from './api.js'
@@ -50,18 +51,75 @@ export function make_new_profile(){
   return;
 }
 
-// change the master, like load order, or added game, etc.
-export function update_master(){
+function enable_mod(master_list: api.master_format, mod: string): api.master_format {
+  let updated_master_list: api.master_format = {...master_list};
+  let last_load_order = 0;
+  Object.keys(master_list).forEach((key) => {
+    if (master_list[key]!.load_index > last_load_order){
+      last_load_order = master_list[key]!.load_index;
+    }
+  })
+  updated_master_list[mod] = {load_index: last_load_order+1,exists: true};
+  return updated_master_list;
+}
+
+function disable_mod(master_list: api.master_format, mod: string): api.master_format {
+  let updated_master_list: api.master_format = {...master_list};
+  let old_index = master_list[mod]!.load_index;
+  delete updated_master_list[mod];
+  Object.keys(updated_master_list).forEach((key) => {
+    if (updated_master_list[key]!.load_index > old_index){
+      updated_master_list[key]!.load_index -= 1;
+    }
+  })
+  return updated_master_list;
+}
+// changes the load order in the master, but i want it to be live so like when you change it in frontend, immediately changes it in file without pressing a confirm button, but idk how to do that for now
+function change_load_order(master_list: api.master_format): api.master_format {
+  let updated_master_list: api.master_format = {...master_list};
+  return updated_master_list;
+}
+
+// change the master, like load order, or changing a game enable, etc.
+export function update_master(req: http.IncomingMessage, res: http.ServerResponse){
+  const requrl: string = req.url || '';
+  if (!requrl){
+    res.writeHead(404);
+    return res.end("false");
+  }
+  const params = api.parse_parameters(requrl);
+  let action: string = params["action"] || '';
+  let game = params["game"] || '';
+  let mod = params["mod"] || '';
+  if (!game || !mod || !action){
+    res.writeHead(404);
+    return res.end("false");
+  }
+  let master_list: api.master_format = api.get_master_list(game);
+  if (action == "enable_mod"){
+    master_list = enable_mod(master_list, mod);
+  } else if (action == "disable_mod") {
+    master_list = disable_mod(master_list, mod);
+  } else if (action == "change_load_order"){
+    master_list = change_load_order(master_list);
+  }
+  const full_master_path: string = path.join(index.config_dir,game,"master_list.json");
+  const raw_master = JSON.stringify(master_list)
+  fs.writeFileSync(full_master_path, raw_master, { encoding: "utf8", flag: "w" })
+  res.writeHead(200);
+  return res.end("true");
+}
+
+// writes the mods from master_file to the selected profile
+export function save_to_profile(){
+  // const profile_array = Object.keys(master_data).sort((a, b) => {
+  //   return master_data[a].load_index - master_data[b].load_index;
+  // });
   return;
 }
 
-// writes the mods to the selected profile
-export function save_to_profile(){
-
-}
-
-// makes the default profile when adding a new game
-export function make_master(){
+// loads the selected profile to the master list
+export function load_profile(){
   return;
 }
 

@@ -39,22 +39,26 @@ export function parse_parameters (rawurl: string) : Record<string,string> {
   return Object.fromEntries(params.entries());
 }
 
+function init_master_list(game_config_dir: string) {
+  const master_file_loc: string = path.join(game_config_dir,"master_list.json");
+  if (fs.existsSync(master_file_loc)){
+    return;
+  }
+  fs.mkdirSync(game_config_dir, {recursive: true});
+  let base_data: string = '{}';
+  fs.writeFileSync(master_file_loc,base_data, { encoding: "utf8", flag: "wx" });
+  return;
+}
+
 // gets the list of mods from the requested game's master_list
-function get_master_list(requrl: string): master_format {
-  if (!requrl) {
-    return {};
-  }
-  let params : Record<string,string> = parse_parameters(requrl);
-  if (!params) {
-    console.log("no valid params");
-    return {}; 
-  }
-  let game: string = params["game"] || "";
+export function get_master_list(game: string): master_format {
   if (!game) {
     return {}; 
   }
   let filename: string = 'master_list.json'; // gets the filename
-  const master_file_loc: string = path.join(index.config_dir,game,filename); // gets the final master loc
+  const game_config_dir: string = path.join(index.config_dir,game); // gets the game config dir
+  init_master_list(game_config_dir);
+  const master_file_loc: string = path.join(game_config_dir,filename)
   // simple check for directory traversal, since it is sorta a user input
   if (index.is_directory_traversal(master_file_loc,index.config_dir)){ 
     return {};
@@ -62,7 +66,6 @@ function get_master_list(requrl: string): master_format {
   // if there is no master by req name, create a new one
   if (!fs.existsSync(master_file_loc)){
     console.log("master missing")
-    cg_mangr.make_master(); // make the master if doesn't exist
     return {};
   }
   let raw_data: Buffer = fs.readFileSync(master_file_loc, { flag: 'r'});
@@ -102,8 +105,19 @@ function sync_master(requrl: string, profile_json: master_format): master_format
 }
 // gets only the profile for load order shit, syncing it first
 function get_master_info(req: http.IncomingMessage, res: http.ServerResponse) {
-  let data: master_format = get_master_list(req.url!);
-  data = sync_master(req.url!,data)
+  let requrl: string = req.url || '';
+  if (!requrl) {
+    res.writeHead(404);
+    return res.end("no valid url");
+  }
+  let params: Record<string, string> = parse_parameters(requrl);
+  const game: string = params["game"] || '';
+  if (!game){
+    res.writeHead(404);
+    return res.end("game not included in url");
+  }
+  let data: master_format = get_master_list(game);
+  data = sync_master(requrl,data)
   res.writeHead(200,{'Content-Type': index.file_types[".json"]});
   return res.end(JSON.stringify(data));
 }
@@ -130,20 +144,20 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
       res.writeHead(404);
       return res.end("no requested url");
     }
-    let master_info: master_format = get_master_list(requrl);
-    master_info = sync_master(requrl,master_info);
     let params: Record<string,string> = parse_parameters(requrl);
     if (!params){
       res.writeHead(404);
       return res.end("no valid params")
     }
+    const game: string = params["game"] || '';
+    if (!game) {
+      res.writeHead(404);
+      return res.end("no game included")
+    }
+    let master_info: master_format = get_master_list(game);
+    master_info = sync_master(requrl,master_info);
     // this section gets the staging folder
     const config_file: cg_mangr.config_format = cg_mangr.get_config();
-    let game: string = params["game"]!;
-    if (!game){
-      res.writeHead(404);
-      return res.end("no game entered");
-    }
     if (!game || !config_file.games[game]){
       console.log("error: game not found in params or config");
       console.log("game: ", game);
