@@ -55,6 +55,7 @@ function serve_static(req: http.IncomingMessage, res: http.ServerResponse, safe_
 
   // spa fallback for frontend routes
   if (ext === '') {
+    console.log("serving index.html")
     const index_path: string = path.join(public_dir, 'index.html');
     fs.readFile(index_path, (err: any, data: Buffer) => {
       if (err) {
@@ -67,14 +68,21 @@ function serve_static(req: http.IncomingMessage, res: http.ServerResponse, safe_
     return;
   }
   // standard static file serving
-  fs.readFile(requested_path, (err: any, data: Buffer) => {
-    if (err) {
-      res.writeHead(404);
-      return res.end('file not found');
-    }
-    res.writeHead(200, { 'Content-Type': content_type });
-    res.end(data);
+  const file_stream = fs.createReadStream(requested_path);
+  console.log('serving ', requested_path);
+  file_stream.on('open', () => {
+    res.writeHead(200, {'Content-Type': content_type});
+    file_stream.pipe(res);
   });
+  file_stream.on('error',(err: any) => {
+    if (err.code === 'ENOENT'){
+      res.writeHead(404);
+      res.end("file not found");
+    } else {
+      res.writeHead(500);
+      res.end('server error');
+    }
+  })
 }
 
 // main traffic cop
