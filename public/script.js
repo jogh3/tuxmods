@@ -1,3 +1,5 @@
+let game_to_mod = "skyrim";
+
 document.addEventListener('DOMContentLoaded', () => {
   // all the sidebar buttons, and their associated functions
   const sidebar_buttons = {
@@ -14,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     start_page(true);
   } else {
     console.log("invalid path");
+    window.location.pathname = "/";
     load_main(true);
   }  
 
@@ -32,47 +35,58 @@ document.addEventListener('DOMContentLoaded', () => {
     let button_press = sidebar_buttons[event.target.id];
     if (button_press) button_press(false);
   })
-  // api calls for the main_body, not permanent
+  // api calls for the main_body
   document.getElementById("main_body").addEventListener('click', (event) => {
-    mod_change(event);
-    switch (event.target.id) {
-      case "test":{
-        console.log("testy pressed");
-        send_payload("POST",'/api/dothing');
-        break;
+    
+    let cur_path = window.location.pathname;
+    
+    if (cur_path == "/") {
+        switch (event.target.id) {
+          case "test":{
+            console.log("testy pressed");
+            send_payload("POST",'/api/dothing');
+            break;
+          }
+          case "test2":{
+            console.log("test pressed");
+            send_payload("POST",'/api/dothingtoo');
+            break;  
+          }
+          case "gettest":{
+            console.log('gettest pressed');
+            send_payload("GET",'/api/getest');
+            break;
+          }
+          default:{
+            break;
+          }
+        }
+    } else if (cur_path === "/mod_list"){ 
+        console.log("checking if mod change");
+        let enable_disable = mod_change(event);
+        if (enable_disable) load_mod_list(false, true);
       }
-      case "test2":{
-        console.log("test pressed");
-        send_payload("POST",'/api/dothingtoo');
-        break;  
-      }
-      case "gettest":{
-        console.log('gettest pressed');
-        send_payload("GET",'/api/getest');
-        break;
-      }
-      default:{
-        break;
-      }
-    }
   })
 });
 
 // temp send payload function
-function send_payload(inmethod, url){
+async function send_payload(inmethod, url){
   const reqpayload = {
     method: inmethod
   };
-  fetch(url,reqpayload);
-  return;
+  const response = await fetch(url, reqpayload);
+  const response_text = await response.text();
+  return response_text === "true";
 }
+
+// calls the api to enable or disable mods
 function mod_change(event) {
-  if(event.target.classList.contains('toggle-btn')) {
-    const target_game = "skyrim" // <--------------------------------------------------- temp
+  if(event.target.classList.contains('toggle-btn')) { // check if it is actually the button that did this
+    const target_game = game_to_mod; // <--------------------------------------------------- temp constant game
     const button_id = event.target.id;
-    const mod_name = button_id.replace('toggle_','')
+    const mod_name = button_id.replace('toggle_',''); // get the pur mod name
     console.log(`toggleing ${mod_name}`);
-    const btn_label = document.getElementById(button_id);
+    const btn_label = document.getElementById(button_id).innerText;
     let btn_action = "";
     if ( btn_label === "enable"){
       btn_action = "enable_mod";
@@ -87,10 +101,11 @@ function mod_change(event) {
       action: btn_action,
       mod: mod_name
     });
+    document.getElementById(button_id).disabled = true;
+    document.getElementById(button_id).innerText = "...";
     console.log("sending, ", params.toString());
     const api_url = `/api/update_master?${params.toString()}`;
-    send_payload('POST', api_url);
-    return true;
+    return send_payload('POST', api_url);
   }
   return false;
 }

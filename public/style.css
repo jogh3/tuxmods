@@ -13,6 +13,10 @@ h1,h2, p, li, pre {
 #top-bar pre {
   color: #a271f7; /* #804cd1 */
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  right: 40px;
 }
 
 #sidebar ul {
@@ -93,4 +97,10 @@ h1,h2, p, li, pre {
   width: 6%;
   padding-top: 5px;
   padding-bottom: 5px;
+  border: #2f2c33;
+  color: #d0cfd1;
+  background-color: #3f295c;
+}
+.toggle-btn:hover {
+  background-color: #634091;
 }

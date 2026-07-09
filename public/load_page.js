@@ -65,29 +65,37 @@ function build_mod_list_html(mod_data) {
   
   return final_html;
 }
-async function load_mod_list(is_pop_state = false) {
+
+async function load_mod_list(is_pop_state = false, is_refresh = false) {
   console.log("changing to mod list");
   // loads the header of the mod list, incase the fetch takes a while so user knows it is trying to load
   let main_body = document.getElementById("main_body");
-  main_body.innerHTML = `
+  const header_html = `
     <h1> mod list </h1>
   `;
+  if (!is_refresh){ // this is here for when you load the page from the sidebar
+    main_body.innerHTML = header_html;
+  }
   if (!is_pop_state) {
     history.pushState({ page: "mod_list" }, "", "/mod_list");
   }
-  let mod_list = await fetch_mod_list("skyrim");
+  let mod_list = await fetch_mod_list(game_to_mod);
   if (!mod_list) {
     console.log("no mods returned");
     main_body.innerHTML += `<h2> no mods returned </h2>`;
     return;
   }
   let formatted_mods = build_mod_list_html(mod_list);
+  if (is_refresh){ // this is for when the page is refreshed from enabling/disabling to get rid of any flicker
+    main_body.innerHTML = header_html;
+  }
   main_body.innerHTML += `
     <ul>
       ${formatted_mods}
     </ul>
   `;
 }
+
 function load_load_order(is_pop_state = false) {
   console.log("changing to load order");
   let main_body = document.getElementById("main_body");

@@ -90,8 +90,17 @@ export function update_master(req: http.IncomingMessage, res: http.ServerRespons
   const params = api.parse_parameters(requrl);
   let action: string = params["action"] || '';
   let game = params["game"] || '';
-  let mod = params["mod"] || '';
-  if (!game || !mod || !action){
+  if (!game || !action){
+    console.log("invalid game or action");
+    res.writeHead(404);
+    return res.end("false");
+  }
+  let mod = '';
+  if (action == "enable_mod" || "disable_mod"){
+    mod = params["mod"] || '';
+  }
+  if (!mod) {
+    console.log("invalid mod");
     res.writeHead(404);
     return res.end("false");
   }
