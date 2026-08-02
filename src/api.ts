@@ -103,6 +103,7 @@ function sync_master(requrl: string, profile_json: master_format): master_format
   })
   return profile_json;
 }
+
 // gets only the profile for load order shit, syncing it first
 function get_master_info(req: http.IncomingMessage, res: http.ServerResponse) {
   let requrl: string = req.url || '';
@@ -163,11 +164,12 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
       console.log("game: ", game);
       console.log("config_file.games[game]: ", config_file.games[game]);
       res.writeHead(404);
-      return res.end("invalid game selection or no game selection");
+      return res.end("invalid or null game selection");
     }
     let staging_dir: string = config_file.games[game]!.staging_loc;
     let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
     let data: mod_list_format = {};
+    // default empty mod list values
     const mpty = {"enabled": false, "load_index":-1,"exists": true};
     // merges the master with the staging items for the mod list section
     Object.keys(staging_items).forEach((key) => {
@@ -181,6 +183,7 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
         data[key] = mpty;
       }
     })
+    // gets the items that were in the master, but not locally in the staging folder
     Object.keys(master_info).forEach((key) => {
       if (!data[key]) {
         data[key] = {

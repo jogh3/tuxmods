@@ -50,10 +50,11 @@ export function get_config(): config_format {
 export function make_new_profile(){
   return;
 }
-
+// enables the mod by editing the master list
 function enable_mod(master_list: api.master_format, mod: string): api.master_format {
   let updated_master_list: api.master_format = {...master_list};
   let last_load_order = 0;
+  // loop to get the highest load order from the master list to append
   Object.keys(master_list).forEach((key) => {
     if (master_list[key]!.load_index > last_load_order){
       last_load_order = master_list[key]!.load_index;
@@ -65,8 +66,10 @@ function enable_mod(master_list: api.master_format, mod: string): api.master_for
 
 function disable_mod(master_list: api.master_format, mod: string): api.master_format {
   let updated_master_list: api.master_format = {...master_list};
+  // load index of the last removed mod
   let old_index = master_list[mod]!.load_index;
   delete updated_master_list[mod];
+  // loops through and decrements the load index of each item that was disabled to get rid of gaps
   Object.keys(updated_master_list).forEach((key) => {
     if (updated_master_list[key]!.load_index > old_index){
       updated_master_list[key]!.load_index -= 1;
@@ -96,6 +99,7 @@ export function update_master(req: http.IncomingMessage, res: http.ServerRespons
     return res.end("false");
   }
   let mod = '';
+  // param format will be different for enable/disable compared to change load order
   if (action == "enable_mod" || "disable_mod"){
     mod = params["mod"] || '';
   }

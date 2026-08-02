@@ -10,13 +10,15 @@ h1,h2, p, li, pre {
   color: #d0cfd1; /*#b6b6b8*/
 }
 
-#top-bar pre {
+#main_body {
+  flex: 1; /* fills the horizontal space next to the sidebar */
+  padding: 10px;
+  overflow-y: auto;
+}
+
+#top_bar pre {
   color: #a271f7; /* #804cd1 */
   font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  right: 40px;
 }
 
 #sidebar ul {
@@ -33,10 +35,11 @@ h1,h2, p, li, pre {
   padding-bottom: 5px;
 }
 
-#content-wrapper {
+#content_wrapper {
   display: flex;
   flex-direction: row;
-  flex: 1; /* fills the vertical space left over by the top-bar */
+  flex: 1; /* fills the vertical space left over by the top_bar */
+  overflow: hidden;
 }
 
 #sidebar {
@@ -62,16 +65,16 @@ h1,h2, p, li, pre {
 #sidebar button:hover{
   background-color: #634091;
 }
-#sidebar button:focus{
+#sidebar button:focus, #sidebar button.active{
   background-color: #3f295c;
 }
 
-#main_body {
-  flex: 1; /* fills the horizontal space next to the sidebar */
-  padding: 10px;
-}
-#top-bar {
+#top_bar {
   border-bottom: 5px ridge black;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  justify-content: space-between;
 }
 .mod-row {
   display: flex;
@@ -103,4 +106,7 @@ h1,h2, p, li, pre {
 }
 .toggle-btn:hover {
   background-color: #634091;
+}
+#game_selection {
+  padding-right: 40px;
 }

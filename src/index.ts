@@ -1,14 +1,38 @@
-#! /usr/bin/env node
+#! /usr/bin/env node 
+import { registerHooks } from 'node:module';
 import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import * as os from 'os';
 
 import * as api from './api.js';
 
-const __filename: string = fileURLToPath(import.meta.url); //setting the filename as different import method
-const __dirname: string = path.dirname(__filename); // setting the filename as different import method
+export let show_color: boolean = true;
+export const __filename: string = fileURLToPath(import.meta.url); //setting the filename as different import method
+export const __dirname: string = path.dirname(__filename); // setting the filename as different import method
+
+const fakeVortexPath = pathToFileURL(path.join(__dirname, './vortex_api_shim.js')).href;
+const fakeWinApiPath = pathToFileURL(path.join(__dirname, './win_api_shim.js')).href;
+
+// 2. Register hooks directly in-line (Synchronously)
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    // Dynamically catch third-party scripts calling vortex-api
+    if (specifier === 'vortex-api') {
+      return { shortCircuit: true, url: fakeVortexPath };
+    }
+
+    // Dynamically catch third-party scripts calling winapi-bindings
+    if (specifier === 'winapi-bindings') {
+      return { shortCircuit: true, url: fakeWinApiPath };
+    }
+
+    // Let all other normal imports and node core modules resolve normally
+    return nextResolve(specifier, context);
+  }
+});
+
 
 // port and host, allow to change with arguments later
 const port: number = 6942; 

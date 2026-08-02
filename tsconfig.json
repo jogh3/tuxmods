@@ -19,6 +19,8 @@
     "sourceMap": false,
     "declaration": false,
     "declarationMap": false,
+    "allowJs": true,
+    "checkJs": false,
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,

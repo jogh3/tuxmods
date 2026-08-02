@@ -1,4 +1,5 @@
 function load_main(is_pop_state = false){
+  update_active_btn("home");
   console.log("changing to home");
   if (!is_pop_state) { // if the page is new and not loaded from a movement button add to the history
     // WE STORE THE STATE HERE! We save { page: "home" }
@@ -13,7 +14,9 @@ function load_main(is_pop_state = false){
   `;
   return;
 }
+
 function load_settings(is_pop_state = false) {
+  update_active_btn("settings");
   console.log("changing to settings");
   if (!is_pop_state) {
     history.pushState({ page: "settings" }, "", "/settings");
@@ -25,6 +28,8 @@ function load_settings(is_pop_state = false) {
   `;
   return;
 }
+
+
 async function fetch_mod_list(target_game){
   const params = new URLSearchParams({ // generate the api request parameters
     game: target_game
@@ -43,6 +48,7 @@ async function fetch_mod_list(target_game){
     return null;
   }
 }
+
 function build_mod_list_html(mod_data) {
   let final_html = '';
   for (const mod_key in mod_data) { // forms the mod info into a list
@@ -52,7 +58,7 @@ function build_mod_list_html(mod_data) {
       button_text = "removed";
       mod_info.load_index = -1;
     }
-    let proper_mod_key = mod_key.replace(/_/g," "); // replaces the "_" with spaces, probaly should undo, depending on later
+    let proper_mod_key = mod_key.replace(/_/g," "); // replaces the "_" with spaces, probably should undo, depending on later
     final_html += `
       <li class="mod-row">
         <span class="mod-name">${proper_mod_key}</span>
@@ -66,7 +72,9 @@ function build_mod_list_html(mod_data) {
   return final_html;
 }
 
+
 async function load_mod_list(is_pop_state = false, is_refresh = false) {
+  update_active_btn("mod_list");
   console.log("changing to mod list");
   // loads the header of the mod list, incase the fetch takes a while so user knows it is trying to load
   let main_body = document.getElementById("main_body");
@@ -90,13 +98,15 @@ async function load_mod_list(is_pop_state = false, is_refresh = false) {
     main_body.innerHTML = header_html;
   }
   main_body.innerHTML += `
-    <ul>
+    <ul id="mod_list">
       ${formatted_mods}
     </ul>
   `;
+  return;
 }
 
 function load_load_order(is_pop_state = false) {
+  update_active_btn("load_order");
   console.log("changing to load order");
   let main_body = document.getElementById("main_body");
   main_body.innerHTML = `
@@ -104,5 +114,20 @@ function load_load_order(is_pop_state = false) {
   `;
   if (!is_pop_state){
     history.pushState({page: "load_order"}, "", "/load_order");
+  }
+  return;
+}
+
+// adds class to show which page is loaded on frontend
+function update_active_btn(page_id) {
+  const all_btns = document.querySelectorAll("#sidebar button");
+  
+  for (let i = 0; i < all_btns.length; i++) {
+    all_btns[i].classList.remove("active");
+  }
+
+  const current_btn = document.getElementById(page_id);
+  if (current_btn) {
+    current_btn.classList.add("active");
   }
 }

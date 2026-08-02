@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-check
 
 const Promise = require('bluebird');
 const React = require('react');
