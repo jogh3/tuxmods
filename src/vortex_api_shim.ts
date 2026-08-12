@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as ofs from 'fs';
 import * as path from 'path';
 
 import * as index from './index.js'
@@ -8,14 +8,41 @@ export namespace util {
   function getVortexPath(id: string) {
     return;
   }
-  function getSafe(obj: any, pathArray: any, defaultValue: any) {
-    return;
+  function getSafe(state: any, path: Array<string | number | undefined>, defaultval: any) {
+    if (!path || path.length === 0) return state ?? defaultval;
+    let current = state;
+    for (let i = 0; i < path.length; i++){
+  current = current?.[path[i]!];
+      if (current == null) return defaultval;
+    }
+    return current ?? defaultval;
   }
+
   function deepMerge(a: any, b: any) {
-    return;
+    if (a === undefined){
+      return b;
+    } else if (b === undefined){
+      return a;
+    }
+    const result: any = {};
+    for ( const key of Object.keys(a).concat(Object.keys(b))) {
+      if (a[key] === undefined || b[key] === undefined) {
+        result[key] = () => a === undefined ? b : a; 
+      }
+      result[key] = 
+        typeof a[key] === "object" && typeof b[key] === "object"
+          ? (result[key] = deepMerge(a[key],b[key]))
+          : Array.isArray(a[key]) && Array.isArray(b[key])
+            ? (result[key] = a[key].concat(b[key]))
+            : (result[key] = () => b[key] === undefined ? a[key] : b[key] );
+    }
+    return result;
   }
   function setdefault(obj: any, key: any, def: any){
-    return;
+    if (!obj[key]){
+      obj[key]=def
+    }
+    return obj[key];
   }
   function makeOverlayableDictionary(){
     return;
@@ -64,7 +91,7 @@ export namespace selectors {
 export namespace log {
   function log(level: string, message: string, metadata: string) {
     if (index.show_color){
-      console.log("\033[38;5;214m\033[48;5;0m",`[Vortex shim - ${level}] ${message}`, "\033[0m");
+      console.log(index.vortex_log_color,`[Vortex shim - ${level}] ${message}`, index.RST);
     } else {
       console.log(`[Vortex shim - ${level}] ${message}`);
     }
@@ -79,3 +106,4 @@ export namespace actions{
     return {};
   }
 }
+

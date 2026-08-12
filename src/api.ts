@@ -65,7 +65,7 @@ export function get_master_list(game: string): master_format {
   }
   // if there is no master by req name, create a new one
   if (!fs.existsSync(master_file_loc)){
-    console.log("master missing")
+    console.error(index.error_color,"master missing",index.RST);
     return {};
   }
   let raw_data: Buffer = fs.readFileSync(master_file_loc, { flag: 'r'});
@@ -78,7 +78,7 @@ export function get_master_list(game: string): master_format {
     let parsed_profile = JSON.parse(file_str) as master_format;
     return parsed_profile;
   } catch (e) {
-    console.log("profile json is corrupted");
+    console.error(index.error_color,"profile json is corrupted",index.RST);
     return {};
   }
 }
@@ -89,9 +89,9 @@ function sync_master(requrl: string, profile_json: master_format): master_format
   const config_file: cg_mangr.config_format = cg_mangr.get_config();
   let game: string = params["game"]!;
   if (!game || !config_file.games[game]){
-    console.log("error: game not found in params or config");
-    console.log("game: ", game);
-    console.log("config_file.games[game]: ", config_file.games[game]);
+    console.error(index.error_color,"error: game not found in params or config",index.RST);
+    console.error(index.debug_color,"game: ", game,index.RST);
+    console.error(index.debug_color,"config_file.games[game]: ", config_file.games[game],index.RST);
     return profile_json;
   }
   let staging_dir: string = config_file.games[game]!.staging_loc;
@@ -160,9 +160,9 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
     // this section gets the staging folder
     const config_file: cg_mangr.config_format = cg_mangr.get_config();
     if (!game || !config_file.games[game]){
-      console.log("error: game not found in params or config");
-      console.log("game: ", game);
-      console.log("config_file.games[game]: ", config_file.games[game]);
+      console.error(index.error_color, "error: game not found in params or config", index.RST);
+      console.error(index.debug_color, "game: ", game, index.RST);
+      console.error(index.debug_color, "config_file.games[game]: ", config_file.games[game], index.RST);
       res.writeHead(404);
       return res.end("invalid or null game selection");
     }

@@ -8,7 +8,31 @@ import * as os from 'os';
 
 import * as api from './api.js';
 
-export let show_color: boolean = true;
+export let show_color: string | null | undefined = process.env.NO_COLOR || null;
+// default color variables
+export let background_def_color: string = "\x1b[48;5;0m"
+export let vortex_log_color: string = background_def_color.concat("\x1b[38;5;214m");
+let request_color: string = background_def_color.concat("\x1b[38;5;45m");
+let dim: string = background_def_color.concat("\x1b[2m")
+let GET_color: string = background_def_color.concat("\x1b[38;5;46m");
+let POST_color: string = background_def_color.concat("\x1b[38;5;165m");
+let starting_color: string = background_def_color.concat("\x1b[93m")
+export let error_color: string = background_def_color.concat("\x1b[38;5;160m");
+export let debug_color: string = background_def_color.concat("\x1b[38;5;123m");
+export const RST: string = "\x1b[0m";
+
+if ( show_color != null && show_color[0] != '\0') {
+  starting_color="";
+  background_def_color="";
+  vortex_log_color="";
+  request_color="";
+  dim="";
+  GET_color="";
+  POST_color="";
+  error_color="";
+  debug_color="";
+}
+
 export const __filename: string = fileURLToPath(import.meta.url); //setting the filename as different import method
 export const __dirname: string = path.dirname(__filename); // setting the filename as different import method
 
@@ -79,7 +103,7 @@ function serve_static(req: http.IncomingMessage, res: http.ServerResponse, safe_
 
   // spa fallback for frontend routes
   if (ext === '') {
-    console.log("serving index.html")
+    console.log(request_color,"serving index.html", RST)
     const index_path: string = path.join(public_dir, 'index.html');
     fs.readFile(index_path, (err: any, data: Buffer) => {
       if (err) {
@@ -93,7 +117,7 @@ function serve_static(req: http.IncomingMessage, res: http.ServerResponse, safe_
   }
   // standard static file serving
   const file_stream = fs.createReadStream(requested_path);
-  console.log('serving ', requested_path);
+  console.log(request_color,'serving ', requested_path, RST);
   file_stream.on('open', () => {
     res.writeHead(200, {'Content-Type': content_type});
     file_stream.pipe(res);
@@ -119,7 +143,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
     const command: string = safe_url.split('?')[0]!.split('/').pop() || '';
     
     if (method === 'GET') {
-      console.log('GET request',safe_url);
+      console.log(GET_color, 'GET request',safe_url, RST);
       const handler: any = api.getroutes[command];
       if (handler) {
         return handler(req, res);
@@ -128,7 +152,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
           return res.end('api endpoint not found');
       }
     } else if (method === 'POST') {
-      console.log('POST request', safe_url);
+      console.log(POST_color, 'POST request', safe_url, RST);
       const handler: any = api.postroutes[command]; 
       if (handler){ 
         return handler(req, res); 
@@ -153,10 +177,11 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
 
 //opening the actual server
 server.listen(port, host, () => {
-  console.log('starting tuxmods')
-  console.log('[ .  . ]');
-  console.log('   \\\/ ');
-  console.log('/  > _ \\');
-  console.log('dirname = ',__dirname);
-  console.log(`server running at http://${host}:${port}/`);
+  console.log(
+`${starting_color}starting tuxmods
+[ .  . ]
+   \\\/
+/  > _ \\
+dirname = ${__dirname}
+server running at http://${host}:${port}/${RST}`);
 });
