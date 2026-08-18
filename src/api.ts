@@ -90,8 +90,8 @@ function sync_master(requrl: string, profile_json: master_format): master_format
   let game: string = params["game"]!;
   if (!game || !config_file.games[game]){
     console.error(index.error_color,"error: game not found in params or config",index.RST);
-    console.error(index.debug_color,"game: ", game,index.RST);
-    console.error(index.debug_color,"config_file.games[game]: ", config_file.games[game],index.RST);
+    index.debug_log(`game: ${game}`);
+    index.debug_log(`config_file.games[game]: ${config_file.games[game]}`);
     return profile_json;
   }
   let staging_dir: string = config_file.games[game]!.staging_loc;
@@ -161,8 +161,8 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
     const config_file: cg_mangr.config_format = cg_mangr.get_config();
     if (!game || !config_file.games[game]){
       console.error(index.error_color, "error: game not found in params or config", index.RST);
-      console.error(index.debug_color, "game: ", game, index.RST);
-      console.error(index.debug_color, "config_file.games[game]: ", config_file.games[game], index.RST);
+      index.debug_log(`game: ${game}`);
+      index.debug_log(`config_file.games[game]: ${config_file.games[game]}`);
       res.writeHead(404);
       return res.end("invalid or null game selection");
     }

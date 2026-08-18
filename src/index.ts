@@ -9,9 +9,9 @@ import * as os from 'os';
 import * as api from './api.js';
 import * as vdf from './vdf_parser.js'
 
-console.log(vdf.get_sgame_info());
 
 export let show_color: string | null | undefined = process.env.NO_COLOR || null;
+const debug_mode: string | null | undefined = process.env.debug_mode || null;
 
 // default color variables
 export let vortex_log_color: string = "\x1b[38;5;214m";
@@ -34,6 +34,16 @@ if ( show_color != null && show_color[0] != '\0') {
   error_color="";
   debug_color="";
 }
+
+
+export function debug_log(message: any) {
+  if (debug_mode != null && debug_mode[0] != '\0'){
+    console.log(debug_color, message, RST);
+  }
+  return;
+}
+
+debug_log(vdf.get_sgame_info());
 
 export const __filename: string = fileURLToPath(import.meta.url); //setting the filename as different import method
 export const __dirname: string = path.dirname(__filename); // setting the filename as different import method
