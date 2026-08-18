@@ -9,21 +9,20 @@ import * as os from 'os';
 import * as api from './api.js';
 
 export let show_color: string | null | undefined = process.env.NO_COLOR || null;
-// default color variables
-export let background_def_color: string = "\x1b[48;5;0m"
-export let vortex_log_color: string = background_def_color.concat("\x1b[38;5;214m");
-let request_color: string = background_def_color.concat("\x1b[38;5;45m");
-let dim: string = background_def_color.concat("\x1b[2m")
-let GET_color: string = background_def_color.concat("\x1b[38;5;46m");
-let POST_color: string = background_def_color.concat("\x1b[38;5;165m");
-let starting_color: string = background_def_color.concat("\x1b[93m")
-export let error_color: string = background_def_color.concat("\x1b[38;5;160m");
-export let debug_color: string = background_def_color.concat("\x1b[38;5;123m");
-export const RST: string = "\x1b[0m";
 
+// default color variables
+export let vortex_log_color: string = "\x1b[38;5;214m";
+let request_color: string = "\x1b[38;5;45m";
+let dim: string = "\x1b[2m";
+let GET_color: string = "\x1b[38;5;46m";
+let POST_color: string = "\x1b[38;5;165m";
+let starting_color: string = "\x1b[38;5;93m";
+export let error_color: string = "\x1b[38;5;160m";
+export let debug_color: string = "\x1b[38;5;123m";
+export const RST: string = "\x1b[0m";
+// if NO_COLOR is set to anything, get rid of all color
 if ( show_color != null && show_color[0] != '\0') {
   starting_color="";
-  background_def_color="";
   vortex_log_color="";
   request_color="";
   dim="";
@@ -58,7 +57,8 @@ registerHooks({
 });
 
 
-// port and host, allow to change with arguments later
+// port and host
+// TODO: allow to change with arguments later
 const port: number = 6942; 
 const host: string = 'localhost';
 
@@ -75,7 +75,8 @@ export const file_types: Record<string, string> = {
   '.ico': 'image/x-icon',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
-  '.svg': 'image/svg+xml'
+  '.svg': 'image/svg+xml',
+  '.bin': 'application/octet-stream'
 };
 
 // this is to check for directory traversal in the requested url for safety purposes
@@ -92,7 +93,7 @@ export function is_directory_traversal(requested_path : string, acceptable: stri
 // separated static file and spa fallback logic
 function serve_static(req: http.IncomingMessage, res: http.ServerResponse, safe_url: string) {
   const requested_path: string = path.join(public_dir, safe_url === '/' ? '/index.html' : safe_url);
-
+  // check for directory traversal
   if (is_directory_traversal(requested_path, public_dir)) {
     res.writeHead(403);
     return res.end("nice try, but you don't fuckle with shuckle");

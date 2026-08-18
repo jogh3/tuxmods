@@ -1,5 +1,6 @@
 import * as ofs from 'fs';
 import * as path from 'path';
+import { createHash } from 'node:crypto';
 
 import * as index from './index.js'
 
@@ -44,11 +45,12 @@ export namespace util {
     }
     return obj[key];
   }
-  function makeOverlayableDictionary(){
-    return;
+  function makeOverlayableDictionary(basedata: any, layers: any, deducelayer: any) : any { 
+    return {};
   }
-  function fileMD5(path: string) {
-    return;
+  function fileMD5(path: string): string {
+    let raw_data: string = ofs.readFileSync(index.config_file).toString();
+    return createHash('md5').update(raw_data).digest('hex');
   }
   function walk(dir: string, cb: any) {
     return;
@@ -90,11 +92,7 @@ export namespace selectors {
 }
 export namespace log {
   function log(level: string, message: string, metadata: string) {
-    if (index.show_color){
-      console.log(index.vortex_log_color,`[Vortex shim - ${level}] ${message}`, index.RST);
-    } else {
-      console.log(`[Vortex shim - ${level}] ${message}`);
-    }
+    console.log(index.vortex_log_color,`[Vortex shim - ${level}] ${message}`, index.RST);
     return;
   }
 }

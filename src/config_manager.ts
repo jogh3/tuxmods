@@ -94,7 +94,7 @@ export function update_master(req: http.IncomingMessage, res: http.ServerRespons
   let action: string = params["action"] || '';
   let game = params["game"] || '';
   if (!game || !action){
-    console.log("invalid game or action");
+    console.error(index.error_color, "invalid game or action", index.RST);
     res.writeHead(404);
     return res.end("false");
   }
@@ -104,7 +104,7 @@ export function update_master(req: http.IncomingMessage, res: http.ServerRespons
     mod = params["mod"] || '';
   }
   if (!mod) {
-    console.log("invalid mod");
+    console.error(index.error_color,"invalid mod",index.RST);
     res.writeHead(404);
     return res.end("false");
   }
