@@ -40,6 +40,7 @@ interface appstate {
   AllowOtherDownloadsWhileRunning: string;
   ScheduledAutoUpdate: string;
   InstalledDepots: Record<string, depot_ids>;
+  SharedDepots?: Record<string, string>;
   UserConfig: uconf;
   MountedConfig: mconf;
 }
@@ -139,26 +140,39 @@ interface sgame_info {
 
 export function get_sgame_info(): sgame_info[] {
   const vdf_file: vdf = openvdf();
+
   mindex.debug_log(vdf_file);
+
   const inner_vdf = vdf_file["libraryfolders"]!;
+
   let all_acf_file_locs: string[] = [];
+
   Object.keys(inner_vdf).forEach(key => {
+
     let lib_loc: string = inner_vdf[key]!.path;
     lib_loc = path.join(lib_loc, "steamapps");
     if (!fs.existsSync(lib_loc)) return;
+
     mindex.debug_log(lib_loc);
+
     const all_files = fs.readdirSync(lib_loc, {recursive: false});
     const acf_files: string[] = all_files
       .filter(file => /\.acf$/.test(file as string))
       .map(file => path.join(lib_loc, file as string));
+
     mindex.debug_log(acf_files);
+
     all_acf_file_locs = all_acf_file_locs.concat(acf_files);
   });
+
   let all_sgame_info: sgame_info[] = [];
+
   all_acf_file_locs.forEach(acf_loc => {
     const acf_file: acf = openacf(acf_loc);
     const acf_info: appstate = acf_file!["AppState"]!;
+
     let new_sgame: sgame_info = {name: acf_info.name,appid: acf_info.appid,library_loc: path.dirname(acf_loc),install_dir: acf_info.installdir};
+
     mindex.debug_log(new_sgame);
     all_sgame_info.push(new_sgame);
   });

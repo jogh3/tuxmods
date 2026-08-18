@@ -8,3 +8,4 @@ app.asar.unpacked
 modstaging
 tuxmods
 libraryfolders.vdf
+.webui_secret_key
