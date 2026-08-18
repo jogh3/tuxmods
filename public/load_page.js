@@ -90,7 +90,7 @@ async function load_mod_list(is_pop_state = false, is_refresh = false) {
   let mod_list = await fetch_mod_list(game_to_mod);
   if (!mod_list) {
     console.log("no mods returned");
-    main_body.innerHTML += `<h2> no mods returned </h2>`;
+    main_body.innerHTML = `<h2> no mods returned </h2>`;
     return;
   }
   let formatted_mods = build_mod_list_html(mod_list);
