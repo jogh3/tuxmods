@@ -49,7 +49,7 @@ export namespace util {
     return {};
   }
   function fileMD5(path: string): string {
-    let raw_data: string = ofs.readFileSync(index.config_file).toString();
+    let raw_data: string = ofs.readFileSync(path).toString();
     return createHash('md5').update(raw_data).digest('hex');
   }
   function walk(dir: string, cb: any) {

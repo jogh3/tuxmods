@@ -7,6 +7,9 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import * as os from 'os';
 
 import * as api from './api.js';
+import * as vdf from './vdf_parser.js'
+
+console.log(vdf.get_sgame_info());
 
 export let show_color: string | null | undefined = process.env.NO_COLOR || null;
 

@@ -2,9 +2,9 @@ node_modules
 build
 *.sh
 res and req format.txt
-save.txt
+*.txt
 *.pdf
 app.asar.unpacked
 modstaging
 tuxmods
-
+libraryfolders.vdf
