@@ -197,6 +197,3 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
     return res.end(JSON.stringify(data));
 }
 
-export function apply_profile(){
-  return;
-}

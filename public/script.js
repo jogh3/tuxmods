@@ -1,4 +1,4 @@
-let game_to_mod = "skyrim";
+let game_to_mod = "The Elder Scrolls V: Skyrim Special Edition";
 
 document.addEventListener('DOMContentLoaded', () => {
   // all the sidebar buttons, and their associated functions

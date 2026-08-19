@@ -6,15 +6,20 @@ import * as mindex from './index.js';
 
 interface depot_ids {
   manifest: string;
-  size: string
+  size: string;
+  dlcappid?: string;
 }
 
 interface uconf {
-  language: string
+  language?: string;
+  BetaKey?: string;
+  DisabledDLC?: string;
 }
 
 interface mconf {
-  language: string
+  language?: string;
+  BetaKey?: string;
+  DisabledDLC?: string;
 }
 
 interface appstate {
@@ -41,6 +46,7 @@ interface appstate {
   ScheduledAutoUpdate: string;
   InstalledDepots: Record<string, depot_ids>;
   SharedDepots?: Record<string, string>;
+  InstallScripts?: Record<string, string>;
   UserConfig: uconf;
   MountedConfig: mconf;
 }

@@ -3,11 +3,23 @@ import * as path from 'path';
 import { createHash } from 'node:crypto';
 
 import * as index from './index.js'
+import * as config from './config_manager.js';
 
 export namespace util {
   // needs to return wine prefix version of the windows file system
   function getVortexPath(id: string) {
-    return;
+    const game: string = "The Elder Scrolls V: Skyrim Special Edition";
+    const config_file: config.config_format = config.get_config();
+    const proton_loc: string = config_file.games[game].proton_loc;
+    let vortex_path: string = "";
+    switch(id) {
+      case "localAppData":
+        vortex_path = path.join(proton_loc, "drive_c/users/steamuser/AppData/Local/");
+        break;
+      default:
+        break;
+    }
+    return vortex_path;
   }
   function getSafe(state: any, path: Array<string | number | undefined>, defaultval: any) {
     if (!path || path.length === 0) return state ?? defaultval;
