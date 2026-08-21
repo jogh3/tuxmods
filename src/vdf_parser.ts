@@ -53,6 +53,7 @@ interface appstate {
 
 export type acf = Record<string, appstate>;
 
+
 type apps_rec = Record<string,string>;
 
 interface index {
@@ -71,7 +72,7 @@ function steam_to_json<T = vdf>(raw_data: string): T {
   // remove comments from vdf or acf
   // \s is all whitespace
   // g means global, m Forces the ^ and $ to match the start and end of individual lines rather
-                                          // than the start and end of the entire block of text
+  //                                         than the start and end of the entire block of text
   raw_data = raw_data.replace(/^\s*\/\/.*$/gm,'');
   // the regex to get all possible important items e.g anything in quotes or { or }
   // () capture group
@@ -117,7 +118,7 @@ function steam_to_json<T = vdf>(raw_data: string): T {
           stack[stack.length - 1]![currentkey]! = text;
           // done with key so reset
           currentkey = null;
-        }
+      }
     }
   }
   // cast to T

@@ -1,4 +1,4 @@
-// this is gonna be the finding steam games, and linking stuff, i would say, maybe more, or more files idk though
+// this is gonna be linking files
 import * as fs from 'fs';
 import * as path from 'path';
 

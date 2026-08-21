@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('popstate', (event) => {
     const page_to_load = event.state && event.state.page ? event.state.page : 'home';
     
-    console.log("Browser navigation detected. Loading:", page_to_load);
+    console.log("navigation detected. Loading:", page_to_load);
     
     if (sidebar_buttons[page_to_load]) { // chcks if page is valid
       sidebar_buttons[page_to_load](true); 
@@ -40,28 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let cur_path = window.location.pathname;
     
-    if (cur_path == "/") {
-        switch (event.target.id) {
-          case "test":{
-            console.log("testy pressed");
-            send_payload("POST",'/api/dothing');
-            break;
-          }
-          case "test2":{
-            console.log("test pressed");
-            send_payload("POST",'/api/dothingtoo');
-            break;  
-          }
-          case "gettest":{
-            console.log('gettest pressed');
-            send_payload("GET",'/api/getest');
-            break;
-          }
-          default:{
-            break;
-          }
-        }
+    if (cur_path == "/" || cur_path == "home") {
+      home_api(event);
+
     } else if (cur_path === "/mod_list"){ 
+
         console.log("checking if mod change");
         let enable_disable = mod_change(event);
         if (enable_disable) load_mod_list(false, true);

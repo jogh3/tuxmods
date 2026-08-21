@@ -12,8 +12,12 @@ interface game_config_form{
   active_profile: string;
 };
 
+interface global_data_format {
+  current_game: string;
+}
+
 export interface config_format {
-  global_data: Record<string,any>;
+  global_data: global_data_format;
   games: Record<string,game_config_form>;
 
 };
@@ -24,12 +28,12 @@ export function init_config() {
     return;
   }
   fs.mkdirSync(index.config_dir, {recursive: true});
-  let base_data: string = '{"global_data": {}, games:{}}';
+  let base_data: string = '{"global_data": { "current_game": ""}, games:{}}';
   fs.writeFileSync(index.config_file,base_data, { encoding: "utf8", flag: "wx" });
   return;
 }
 
-// writes info to config file
+// writes game info to config file, like game location, proton/wine location, etc.
 export function write_game_locs(game: string, file_datas: Record<string,string>) {
   init_config();
   return;
@@ -50,6 +54,7 @@ export function get_config(): config_format {
 export function make_new_profile(){
   return;
 }
+
 // enables the mod by editing the master list
 function enable_mod(master_list: api.master_format, mod: string): api.master_format {
   let updated_master_list: api.master_format = {...master_list};
@@ -60,7 +65,7 @@ function enable_mod(master_list: api.master_format, mod: string): api.master_for
       last_load_order = master_list[key]!.load_index;
     }
   })
-  updated_master_list[mod] = {load_index: last_load_order+1,exists: true};
+  updated_master_list[mod] = {load_index: last_load_order+1, install_location: ""};
   return updated_master_list;
 }
 
@@ -141,8 +146,42 @@ function write_profile_sync(requrl: string, profile_info: api.master_format) {
 
 }
 
-// adds a game to the config file
+// adds a game to the config file+makes the directory
 export function add_game(game_info: any) {
   // gotta create staging dir as well as well as a new default profile
   return;
+}
+// changes the currently modding game in the config file
+export function change_current_game(req: http.IncomingMessage, res: http.ServerResponse) {
+  let req_url: string = req.url || '';
+  const params = api.parse_parameters(req_url);
+  const new_game = params["new_game"]
+  if (!new_game) {
+    res.writeHead(404);
+    return res.end("false");
+  }
+  let config_file: config_format = get_config();
+  config_file.global_data.current_game = new_game;
+  const raw_config = JSON.stringify(config_file);
+  fs.writeFileSync(index.config_file, raw_config, { encoding: "utf8", flag: "w" });
+  res.writeHead(200);
+  return res.end("true");
+}
+
+// gets the game currently being modded from the config file
+export function return_game(): string {
+  const config_file: config_format = get_config();
+  return config_file.global_data.current_game;
+}
+
+// for when the website requests the game
+export function get_current_game(req: http.IncomingMessage, res: http.ServerResponse) {
+  const game: string = return_game();
+  if (!game) {
+    console.error(index.error_color, "current game empty in config", index.RST);
+    res.writeHead(204);
+    return res.end("current game empty in config");
+  }
+  res.writeHead(200);
+  res.end(game);
 }

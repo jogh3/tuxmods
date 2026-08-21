@@ -7,13 +7,14 @@ import * as cg_mangr from './config_manager.js';
 
 interface master_entry {
   load_index: number;
-  exists: boolean;
+  install_location: string;
 }
 
 interface mod_entry {
   enabled: boolean;
   load_index: number;
   exists: boolean;
+  install_location: string;
 }
 
 export type master_format = Record<string,master_entry>;
@@ -22,13 +23,15 @@ export type mod_list_format = Record<string,mod_entry>;
 // all get functions that can be requested
 export const getroutes: Record<string,any> = {
   'get_mod_list': get_mod_list,
-  'get_master_info': get_master_info
+  'get_master_info': get_master_info,
+  'get_current_game': cg_mangr.get_current_game
 };
 // all post functions that can be requested
 export const postroutes: Record<string,any> = {
   'add_game':cg_mangr.add_game,
   "make_new_prof":cg_mangr.make_new_profile,
-  "update_master":cg_mangr.update_master
+  "update_master":cg_mangr.update_master,
+  "change_current_game": cg_mangr.change_current_game
 };
 
 // parses api request parameters, into each parameter, in name:value pair
@@ -65,7 +68,7 @@ export function get_master_list(game: string): master_format {
   }
   // if there is no master by req name, create a new one
   if (!fs.existsSync(master_file_loc)){
-    console.error(index.error_color,"master missing",index.RST);
+    console.error("master missing")
     return {};
   }
   let raw_data: Buffer = fs.readFileSync(master_file_loc, { flag: 'r'});
@@ -78,7 +81,7 @@ export function get_master_list(game: string): master_format {
     let parsed_profile = JSON.parse(file_str) as master_format;
     return parsed_profile;
   } catch (e) {
-    console.error(index.error_color,"profile json is corrupted",index.RST);
+    console.error("profile json is corrupted")
     return {};
   }
 }
@@ -89,18 +92,11 @@ function sync_master(requrl: string, profile_json: master_format): master_format
   const config_file: cg_mangr.config_format = cg_mangr.get_config();
   let game: string = params["game"]!;
   if (!game || !config_file.games[game]){
-    console.error(index.error_color,"error: game not found in params or config",index.RST);
+    console.error("error: game not found in params or config")
     index.debug_log(`game: ${game}`);
     index.debug_log(`config_file.games[game]: ${config_file.games[game]}`);
     return profile_json;
   }
-  let staging_dir: string = config_file.games[game]!.staging_loc;
-  let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
-  Object.keys(profile_json).forEach((key: string) => {
-    if(!staging_items[key] && profile_json[key]){
-      profile_json[key].exists = false;
-    }
-  })
   return profile_json;
 }
 
@@ -170,14 +166,15 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
     let staging_items: Record<string,boolean> = get_staging_items(staging_dir);
     let data: mod_list_format = {};
     // default empty mod list values
-    const mpty = {"enabled": false, "load_index":-1,"exists": true};
+    const mpty = {"enabled": false, "load_index":-1,"exists": true, "install_location": ""};
     // merges the master with the staging items for the mod list section
     Object.keys(staging_items).forEach((key) => {
       if (master_info[key]){
         data[key] = {
           enabled: true,
           load_index: master_info[key]!.load_index,
-          exists: master_info[key]!.exists
+          exists: true,
+          install_location: master_info[key]!.install_location
         };
       } else{
         data[key] = mpty;
@@ -187,9 +184,10 @@ export function get_mod_list(req: http.IncomingMessage, res: http.ServerResponse
     Object.keys(master_info).forEach((key) => {
       if (!data[key]) {
         data[key] = {
-          exists: master_info[key]!.exists,
+          exists: false,
           load_index: master_info[key]!.load_index,
-          enabled: true
+          enabled: true,
+          install_location: master_info[key]!.install_location
         };
       }
     })

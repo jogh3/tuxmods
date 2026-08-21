@@ -2,9 +2,11 @@
 import { registerHooks } from 'node:module';
 import * as http from 'http';
 import * as fs from 'fs';
+import { stat, unlink } from 'fs/promises';
 import * as path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import * as os from 'os';
+import * as util from 'util';
 
 import * as api from './api.js';
 import * as vdf from './vdf_parser.js'
@@ -35,13 +37,8 @@ if ( show_color != null && show_color[0] != '\0') {
   debug_color="";
 }
 
-
-export function debug_log(message: any) {
-  if (debug_mode != null && debug_mode[0] != '\0'){
-    console.log(debug_color, message, RST);
-  }
-  return;
-}
+const og_log = console.log;
+const og_error = console.error;
 
 debug_log(vdf.get_sgame_info());
 
@@ -74,6 +71,8 @@ registerHooks({
 // TODO: allow to change with arguments later
 const port: number = 6942; 
 const host: string = 'localhost';
+// max allowed log size in bytes(2GiB by default, allow change with argument)
+const max_log_size: number = 2147483648;
 
 export const config_dir: string = path.join(os.homedir(), '.config', 'tuxmods');
 export const config_file: string = path.join(config_dir, 'config.json');
@@ -91,6 +90,44 @@ export const file_types: Record<string, string> = {
   '.svg': 'image/svg+xml',
   '.bin': 'application/octet-stream'
 };
+
+const log_file_loc = path.join(config_dir, "tuxmods.log")
+
+async function check_log_size() {
+  const file_info = await stat(log_file_loc);
+  const total_bytes = file_info.size;
+
+  if (total_bytes > max_log_size) {
+    await unlink(log_file_loc);
+  }
+}
+
+await check_log_size();
+
+console.log = function(...args) {
+  let full_output: string = util.format(...args);
+  og_log(full_output);
+  let log_date = new Date();
+  full_output = `${log_date}: ${full_output}`;
+  fs.writeFileSync(log_file_loc, full_output,{ encoding: "utf8", flag: "a+"});
+  return;
+}
+
+console.error = function(...args) {
+  let full_output = util.format(...args);
+  og_error(error_color, full_output, RST);
+  let log_date = new Date();
+  full_output = `${log_date}: [ERROR] ${full_output}`;
+  fs.writeFileSync(log_file_loc, full_output, {encoding: "utf8", flag: "a+"});
+  return;
+}
+
+export function debug_log(message: any) {
+  if (debug_mode != null && debug_mode[0] != '\0'){
+    console.log(debug_color, message, RST);
+  }
+  return;
+}
 
 // this is to check for directory traversal in the requested url for safety purposes
 export function is_directory_traversal(requested_path : string, acceptable: string) : boolean{
