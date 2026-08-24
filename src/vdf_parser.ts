@@ -142,7 +142,7 @@ interface sgame_info {
   name: string;
   appid: string;
   library_loc: string;
-  install_dir: string;
+  install_dir: string; // name of where game is installed in steamapps/common
 }
 
 export function get_sgame_info(): sgame_info[] {

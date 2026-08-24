@@ -3,6 +3,7 @@ import * as path from 'path';
 import { createHash } from 'node:crypto';
 import * as os from 'os';
 
+
 import * as index from './index.js'
 import * as config from './config_manager.js';
 
@@ -71,7 +72,7 @@ export namespace util {
     const game: string = config.return_game();
 
     if (!game) {
-      console.error(index.error_color, "GET_VORTEX_PATH: no game selected", index.RST);
+      console.error("GET_VORTEX_PATH: no game selected");
       return "";
     }
 
@@ -100,7 +101,7 @@ export namespace util {
         vortex_path = path.join(user_base, "Desktop");
         break;
       default:
-        console.error(index.error_color, "[Vortex Shim - Warn] Extension requested unsupported path ID:", id, index.RST)
+        console.error("[Vortex Shim - Warn] Extension requested unsupported path ID:");
         break;
     }
     return vortex_path;
@@ -116,6 +117,10 @@ export namespace util {
     return current ?? defaultval;
   }
 
+  function pick(lhs: any, rhs: any): any {
+    return lhs === undefined ? rhs : lhs;
+  }
+  // a = lhs, b = rhs
   function deepMerge(a: any, b: any) {
     if (a === undefined){
       return b;
@@ -132,7 +137,7 @@ export namespace util {
           ? (result[key] = deepMerge(a[key],b[key]))
           : Array.isArray(a[key]) && Array.isArray(b[key])
             ? (result[key] = a[key].concat(b[key]))
-            : (result[key] = () => b[key] === undefined ? a[key] : b[key] );
+            : (result[key] = pick(b[key], a[key]));
     }
     return result;
   }
@@ -185,11 +190,23 @@ export namespace util {
     return createHash('md5').update(raw_data).digest('hex');
   }
 
-  export async function walk(
-    target: string,
-    callback: (iterPath: string, stats: ofs.Stats) => PromiseLike<any>,
-    options?: IWalkOptions,
-  ): Promise<void> {
+  export function getErrorCode(err: unknown): string | null {
+    if (!(err instanceof Error)) {
+      return null;
+    }
+
+    if (!("code" in err)) {
+      return null;
+    }
+
+    if (typeof err.code !== "string") {
+      return null;
+    }
+
+    return err.code;
+  }
+
+  export async function walk(target: string, callback: (iterPath: string, stats: ofs.Stats) => PromiseLike<any>,options?: any,): Promise<void> {
     const opt = options || {};
 
     try {
@@ -217,7 +234,7 @@ export namespace util {
         if (stat === null) {
           return;
         }
-        const fullPath = path.join(target, fileNames[idx]);
+        const fullPath = path.join(target, fileNames[idx]!);
         cbPromises.push(callback(fullPath, stat));
         if (stat.isDirectory() && path.extname(fullPath) !== ".asar") {
           subDirs.push(fullPath);
@@ -249,20 +266,24 @@ export namespace util {
 }
 
 export namespace fs {
-  function readFileAsync(){
+  export import Stats = ofs.Stats;
+  export async function readFileAsync(f: string): Promise<string>{
+    return ofs.promises.readFile(f).toString();
+  }
+  export async function writeFileAsync() {
     return;
   }
-  function writeFileAsync() {
+  export async function readdirAsync(dir: string): Promise<string[]>{
+    return ofs.promises.readdir(dir);
+  }
+  export async function ensureDirAsync() {
     return;
   }
-  function readdirAsync(){
+  export async function ensureFileAsync() {
     return;
   }
-  function ensureDirAsync() {
-    return;
-  }
-  function ensureFileAsync() {
-    return;
+  export async function lstatAsync(target_path: string): Promise<Stats> {
+    return ofs.promises.lstat(target_path);
   }
 }
 
@@ -281,11 +302,9 @@ export namespace selectors {
   }
 }
 
-export namespace log {
-  function log(level: string, message: string, metadata: string) {
-    console.log(index.vortex_log_color,`[Vortex shim - ${level}] ${message}`, index.RST);
-    return;
-  }
+export function log(level: string, message: string, metadata: any) {
+  console.log(index.vortex_log_color,`[Vortex shim - ${level}] ${message} ${metadata}`, index.RST);
+  return;
 }
 
 export namespace actions{

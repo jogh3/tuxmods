@@ -65,7 +65,7 @@ async function send_payload(inmethod, url){
 // calls the api to enable or disable mods
 function mod_change(event) {
   if(event.target.classList.contains('toggle-btn')) { // check if it is actually the button that did this
-    const target_game = game_to_mod; // <--------------------------------------------------- temp constant game
+    const target_game = game_to_mod;
     const button_id = event.target.id;
     const mod_name = button_id.replace('toggle_',''); // get the pur mod name
     console.log(`toggleing ${mod_name}`);

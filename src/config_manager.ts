@@ -19,7 +19,6 @@ interface global_data_format {
 export interface config_format {
   global_data: global_data_format;
   games: Record<string,game_config_form>;
-
 };
 
 // checks if the config exists and makes one with base values if it doesn't
@@ -88,6 +87,11 @@ function change_load_order(master_list: api.master_format): api.master_format {
   return updated_master_list;
 }
 
+function reinstall_mod(master_list: api.master_format, mod: string): api.master_format{
+  // reinstall the mod using install_location in the master_list, then enable it
+  return {};
+}
+
 // change the master, like load order, or changing a game enable, etc.
 export function update_master(req: http.IncomingMessage, res: http.ServerResponse){
   const requrl: string = req.url || '';
@@ -99,17 +103,19 @@ export function update_master(req: http.IncomingMessage, res: http.ServerRespons
   let action: string = params["action"] || '';
   let game = params["game"] || '';
   if (!game || !action){
-    console.error(index.error_color, "invalid game or action", index.RST);
+    console.error("invalid game or action");
     res.writeHead(404);
     return res.end("false");
   }
   let mod = '';
-  // param format will be different for enable/disable compared to change load order
-  if (action == "enable_mod" || "disable_mod"){
+  let mod_reqd: boolean = false
+  // param format will be different for enable/disable & reinstall compared to change load order
+  if (action == "enable_mod" || "disable_mod" || "reinstall"){
     mod = params["mod"] || '';
+    mod_reqd = true
   }
-  if (!mod) {
-    console.error(index.error_color,"invalid mod",index.RST);
+  if (!mod && mod_reqd) {
+    console.error("invalid mod");
     res.writeHead(404);
     return res.end("false");
   }
@@ -120,6 +126,8 @@ export function update_master(req: http.IncomingMessage, res: http.ServerRespons
     master_list = disable_mod(master_list, mod);
   } else if (action == "change_load_order"){
     master_list = change_load_order(master_list);
+  } else if (action == "reinstall") {
+    master_list = reinstall_mod(master_list, mod);
   }
   const full_master_path: string = path.join(index.config_dir,game,"master_list.json");
   const raw_master = JSON.stringify(master_list)
@@ -157,6 +165,7 @@ export function change_current_game(req: http.IncomingMessage, res: http.ServerR
   const params = api.parse_parameters(req_url);
   const new_game = params["new_game"]
   if (!new_game) {
+    console.error("no new game specified");
     res.writeHead(404);
     return res.end("false");
   }
@@ -178,7 +187,7 @@ export function return_game(): string {
 export function get_current_game(req: http.IncomingMessage, res: http.ServerResponse) {
   const game: string = return_game();
   if (!game) {
-    console.error(index.error_color, "current game empty in config", index.RST);
+    console.error("current game empty in config");
     res.writeHead(204);
     return res.end("current game empty in config");
   }

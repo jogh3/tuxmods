@@ -68,7 +68,7 @@ registerHooks({
 
 
 // port and host
-// TODO: allow to change with arguments later
+// TODO: allow to change with arguments
 const port: number = 6942; 
 const host: string = 'localhost';
 // max allowed log size in bytes(2GiB by default, allow change with argument)
@@ -122,7 +122,8 @@ console.error = function(...args) {
   return;
 }
 
-export function debug_log(message: any) {
+export function debug_log(...args: any) {
+  const message: string = util.format(...args);
   if (debug_mode != null && debug_mode[0] != '\0'){
     console.log(debug_color, message, RST);
   }
@@ -234,5 +235,6 @@ server.listen(port, host, () => {
    \\\/
 /  > _ \\
 dirname = ${__dirname}
-server running at http://${host}:${port}/${RST}`);
+server running at http://${host}:${port}/
+${RST}`);
 });
