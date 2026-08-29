@@ -1,6 +1,22 @@
-let game_to_mod = "The Elder Scrolls V: Skyrim Special Edition";
+let game_to_mod =""; //"The Elder Scrolls V: Skyrim Special Edition";
 
-document.addEventListener('DOMContentLoaded', () => {
+async function get_current_game() {
+  let returned_game = "";
+  const api_url = `/api/get_current_game`;
+  try {
+      const response = await fetch(api_url);
+      returned_game = await response.text();
+      
+      // text_data is now your string
+    } catch (err) {
+      console.error('error fetching string:', err);
+    }
+  return returned_game;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  game_to_mod = await get_current_game();
+  console.log("game to mod is:", game_to_mod);
   // all the sidebar buttons, and their associated functions
   const sidebar_buttons = {
     "home": load_main,

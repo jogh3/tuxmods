@@ -162,7 +162,7 @@ export function get_sgame_info(): sgame_info[] {
 
     mindex.debug_log(lib_loc);
 
-    const all_files = fs.readdirSync(lib_loc, {recursive: false});
+    const all_files: string[] | NonSharedBuffer[] = fs.readdirSync(lib_loc, {recursive: false});
     const acf_files: string[] = all_files
       .filter(file => /\.acf$/.test(file as string))
       .map(file => path.join(lib_loc, file as string));

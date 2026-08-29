@@ -88,10 +88,13 @@ export const file_types: Record<string, string> = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
-  '.bin': 'application/octet-stream'
+  '.bin': 'application/octet-stream',
+  '.txt': 'text/plain'
 };
 
 const log_file_loc = path.join(config_dir, "tuxmods.log")
+
+if (!fs.existsSync(log_file_loc)) fs.writeFileSync(log_file_loc,"",{});
 
 async function check_log_size() {
   const file_info = await stat(log_file_loc);
@@ -108,7 +111,7 @@ console.log = function(...args) {
   let full_output: string = util.format(...args);
   og_log(full_output);
   let log_date = new Date();
-  full_output = `${log_date}: ${full_output}`;
+  full_output = `${log_date}: ${full_output}\n`;
   fs.writeFileSync(log_file_loc, full_output,{ encoding: "utf8", flag: "a+"});
   return;
 }
@@ -117,7 +120,7 @@ console.error = function(...args) {
   let full_output = util.format(...args);
   og_error(error_color, full_output, RST);
   let log_date = new Date();
-  full_output = `${log_date}: [ERROR] ${full_output}`;
+  full_output = `${log_date}: [ERROR] ${full_output}\n`;
   fs.writeFileSync(log_file_loc, full_output, {encoding: "utf8", flag: "a+"});
   return;
 }

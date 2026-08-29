@@ -3,7 +3,6 @@ import * as path from 'path';
 import { createHash } from 'node:crypto';
 import * as os from 'os';
 
-
 import * as index from './index.js'
 import * as config from './config_manager.js';
 
@@ -67,7 +66,7 @@ export namespace util {
     desktop: string;
   };
   // needs to return wine prefix version of the windows file system
-  function getVortexPath(id: string): string {
+  export function getVortexPath(id: keyof VortexPaths): string {
     const config_file: config.config_format = config.get_config();
     const game: string = config.return_game();
 
@@ -79,20 +78,23 @@ export namespace util {
     let proton_loc: string = config_file.games[game]!.proton_loc;
 
     if (!ofs.existsSync(proton_loc) || proton_loc == "") proton_loc = path.join(os.homedir(),".wine");
-    const user_base = path.join(proton_loc,"drive_c","users","steamuser");
+    // proton and bottles use steamuser, wine usually uses the username of the account but can also have steamuser
+    // should hopefully account for most usecases
+    let user_base = path.join(proton_loc,"drive_c","users","steamuser");
+    if (!ofs.existsSync(user_base)) user_base = path.join(proton_loc, "drive_c", "users", os.userInfo().username);
     if (!ofs.existsSync(user_base)) ofs.mkdirSync(user_base);
 
     let vortex_path: string = "";
     // TODO: get all the proton paths that could be requested, not difficult but requires research
     switch(id) {
       case "localAppData":
-        vortex_path = path.join(proton_loc, "drive_c","users","steamuser","AppData","Local");
+        vortex_path = path.join(user_base,"AppData","Local");
         break;
       case "appData":
-        vortex_path = path.join(proton_loc, "AppData","Roaming");
+        vortex_path = path.join(user_base, "AppData","Roaming");
         break;
       case "documents":
-        vortex_path = path.join(proton_loc, "Documents");
+        vortex_path = path.join(user_base, "Documents");
         break;
       case "home":
         vortex_path = user_base;
@@ -101,13 +103,13 @@ export namespace util {
         vortex_path = path.join(user_base, "Desktop");
         break;
       default:
-        console.error("[Vortex Shim - Warn] Extension requested unsupported path ID:");
+        console.error("[Vortex Shim - Warn] Extension requested unsupported path ID:", id);
         break;
     }
     return vortex_path;
   }
 
-  function getSafe(state: any, path: Array<string | number | undefined>, defaultval: any) {
+  export function getSafe(state: any, path: Array<string | number | undefined>, defaultval: any) {
     if (!path || path.length === 0) return state ?? defaultval;
     let current = state;
     for (let i = 0; i < path.length; i++){
@@ -121,7 +123,7 @@ export namespace util {
     return lhs === undefined ? rhs : lhs;
   }
   // a = lhs, b = rhs
-  function deepMerge(a: any, b: any) {
+  export function deepMerge(a: any, b: any) {
     if (a === undefined){
       return b;
     } else if (b === undefined){
@@ -149,7 +151,7 @@ export namespace util {
     return obj[key];
   }
 
-  function makeoverlayabledictionary<keyt extends string | number | symbol, valuet>(basedata: Record<keyt, valuet>, layers: { [layerid: string]: Record<keyt, Partial<valuet>> }, deducelayer: (key: keyt, extraarg: any) => string): any { 
+  export function makeoverlayabledictionary<keyt extends string | number | symbol, valuet>(basedata: Record<keyt, valuet>, layers: { [layerid: string]: Record<keyt, Partial<valuet>> }, deducelayer: (key: keyt, extraarg: any) => string): any { 
     // matching the lowercase parameter names exactly
     const res = new Overlayable<keyt, valuet>(basedata, deducelayer);
     
@@ -185,7 +187,7 @@ export namespace util {
     return new Proxy(res, proxyHandler);
   }
 
-  function fileMD5(path: string): string {
+  export function fileMD5(path: string): string {
     let raw_data: string = ofs.readFileSync(path).toString();
     return createHash('md5').update(raw_data).digest('hex');
   }
@@ -270,13 +272,13 @@ export namespace fs {
   export async function readFileAsync(f: string): Promise<string>{
     return ofs.promises.readFile(f).toString();
   }
-  export async function writeFileAsync() {
-    return;
+  export async function writeFileAsync(file: string,data: any, options?: ofs.WriteFileOptions): Promise<void> {
+    return ofs.promises.writeFile(file, data, options);
   }
   export async function readdirAsync(dir: string): Promise<string[]>{
     return ofs.promises.readdir(dir);
   }
-  export async function ensureDirAsync() {
+  export async function ensureDirAsync(): Promise<void> {
     return;
   }
   export async function ensureFileAsync() {

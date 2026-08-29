@@ -191,6 +191,6 @@ export function get_current_game(req: http.IncomingMessage, res: http.ServerResp
     res.writeHead(204);
     return res.end("current game empty in config");
   }
-  res.writeHead(200);
+  res.writeHead(200, { 'Content-Type': index.file_types[".txt"] });
   res.end(game);
 }
