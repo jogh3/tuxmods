@@ -1,4 +1,4 @@
-import * as ofs from 'fs';
+import * as ofs from 'fs-extra';
 import * as path from 'path';
 import { createHash } from 'node:crypto';
 import * as os from 'os';
@@ -269,24 +269,91 @@ export namespace util {
 
 export namespace fs {
   export import Stats = ofs.Stats;
-  export async function readFileAsync(f: string): Promise<string>{
-    return ofs.promises.readFile(f).toString();
+
+  function convert_to_unix(inp_path: string): string {
+    (!inp_path) return "";
+
+    // convert the path from windows(\) to unix(/) just in case some paths are hardcoded for some reason;
+    let proper_path: string = inp_path;
+    proper_path = proper_path.replace(/\\/g, '/');
+    
+    const windows_drive = /^[a-zA-Z]:[\\/]/;
+    if (windows_drive.test(windows_drive)) {
+
+      let config_game: string = config.return_game();
+
+      let config_data: string = config.get_config();
+
+      let proton_loc: string = config_data.games[game]!.proton_loc
+
+      if (!ofs.existsSync(proton_loc) || proton_loc == "") proton_loc = path.join(os.homedir(),".wine");
+
+      let c_path: string = path.join(proton_loc, "drive_c");
+      let without_c: string = inp_path.slice(4,-1);
+
+      proper_path = path.join(c_path,without_c);
+    }
+    return path.normalize(proper_path);
   }
+
+  export async function readFileAsync(f: string, options?: any): Promise<string>{
+    f = convert_to_unix(f);
+    const data = await ofs.promises.readFile(f, { encoding: 'utf8', ...options });
+    return data;
+  }
+
   export async function writeFileAsync(file: string,data: any, options?: ofs.WriteFileOptions): Promise<void> {
+    file = convert_to_unix(file);
     return ofs.promises.writeFile(file, data, options);
   }
+
   export async function readdirAsync(dir: string): Promise<string[]>{
+    dir = convert_to_unix(dir);
     return ofs.promises.readdir(dir);
   }
-  export async function ensureDirAsync(): Promise<void> {
+
+  export async function ensureDirAsync(dir_path: string, on_dir_created_cb?: (created: string) => PromiseLike<void>): Promise<void> {
+    dir_path = convert_to_unix(dir_path);
+    if (on_dir_created_cb) {
+      // create parent directories manually and execute on_dir_created_cb
+      let current_made: string = "";
+      let split_dir: string[] = dir_path.split(path.sep);
+      for (let i = 0; i < split_dir.length; i++){
+        current_made = path.join(current_made,split_dir[i]);
+        if (!ofs.existsSync(current_made)){
+          ofs.mkdirSync(current_made);
+          on_dir_created_cb(current_made)
+        }
+      }
+    } else {
+      // just use the build into node one
+      ofs.ensureDir(dir_path);
+    }
     return;
   }
-  export async function ensureFileAsync() {
-    return;
+
+  export async function ensureFileAsync(file_path: string): Promise<void> {
+    file_path = convert_to_unix(file_path);
+    return Promise.resolve(ofs.ensureFile(file_path));
   }
+
+  export async function ensureDirWritableAsync(dir_path: string, confirm?: () => PromiseLike<void>): Promise<void> {
+    dir_path = convert_to_unix(dir_path);
+    try {
+      // W_OK is the flag for write permission
+      await ofs.promises.access(dir_path, ofs.constants.W_OK);
+      if (confirm) await confirm();
+    } catch (err) {
+      console.error(`[Vortex Shim] ensureDirWritableAsync failed for ${dir_path}`);
+      throw err;
+    }
+  }
+
   export async function lstatAsync(target_path: string): Promise<Stats> {
+    target_path = convert_to_unix(target_path);
     return ofs.promises.lstat(target_path);
   }
+
 }
 
 export namespace selectors {

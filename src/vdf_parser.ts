@@ -141,8 +141,8 @@ function openacf(acf_path:string): acf {
 interface sgame_info {
   name: string;
   appid: string;
-  library_loc: string;
-  install_dir: string; // name of where game is installed in steamapps/common
+  library_loc: string; // steam library location
+  install_dir: string; // name of directory where game is installed in steamapps/common/
 }
 
 export function get_sgame_info(): sgame_info[] {

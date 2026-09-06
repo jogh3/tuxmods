@@ -15,16 +15,19 @@ import * as vdf from './vdf_parser.js'
 export let show_color: string | null | undefined = process.env.NO_COLOR || null;
 const debug_mode: string | null | undefined = process.env.debug_mode || null;
 
+const all_colors: string[] = ["\x1b[38;5;214m", "\x1b[38;5;45m", "\x1b[2m", "\x1b[38;5;46m",
+                            "\x1b[38;5;165m", "\x1b[38;5;93m", "\x1b[38;5;160m", "\x1b[38;5;123m", "\x1b[0m"];
+
 // default color variables
-export let vortex_log_color: string = "\x1b[38;5;214m";
-let request_color: string = "\x1b[38;5;45m";
-let dim: string = "\x1b[2m";
-let GET_color: string = "\x1b[38;5;46m";
-let POST_color: string = "\x1b[38;5;165m";
-let starting_color: string = "\x1b[38;5;93m";
-export let error_color: string = "\x1b[38;5;160m";
-export let debug_color: string = "\x1b[38;5;123m";
-export const RST: string = "\x1b[0m";
+export let vortex_log_color: string = all_colors[0]!;
+let request_color: string = all_colors[1]!;
+let dim: string = all_colors[2]!;
+let GET_color: string = all_colors[3]!;
+let POST_color: string = all_colors[4]!;
+let starting_color: string = all_colors[5]!;
+export let error_color: string = all_colors[6]!;
+export let debug_color: string = all_colors[7]!;
+export const RST: string = all_colors[0]!;
 // if NO_COLOR is set to anything, get rid of all color
 if ( show_color != null && show_color[0] != '\0') {
   starting_color="";
@@ -107,17 +110,42 @@ async function check_log_size() {
 
 await check_log_size();
 
+function get_custom_date(oDate: Date) {
+    let sDate: string = "";
+    if (oDate instanceof Date) {
+        sDate = oDate.getFullYear() + 1900
+            + ':'
+            + ((oDate.getMonth() + 1 < 10) ? '0' + (oDate.getMonth() + 1) : oDate.getMonth() + 1)
+            + ':' + oDate.getDate()
+            + ':' + oDate.getHours()
+            + ':' + ((oDate.getMinutes() < 10) ? '0' + (oDate.getMinutes()) : oDate.getMinutes())
+            + ':' + ((oDate.getSeconds() < 10) ? '0' + (oDate.getSeconds()) : oDate.getSeconds());
+    } else {
+        throw new Error("oDate is not an instance of Date");
+    }
+    return sDate;
+}
+
+function strip_color(log: string): string {
+  for (let i = 0; i < all_colors.length; i++) {
+    log = log.replace(all_colors[i]!,"");
+  }
+  return log;
+}
+
 console.log = function(...args) {
-  let full_output: string = util.format(...args);
-  og_log(full_output);
-  let log_date = new Date();
-  full_output = `${log_date}: ${full_output}\n`;
+  let full_msg: string = util.format(...args);
+  og_log(full_msg);
+  let curr_date = new Date();
+  let log_date = curr_date;
+  let stripped_msg: string = strip_color(full_msg);
+  let full_output = `${log_date}: ${stripped_msg}\n`;
   fs.writeFileSync(log_file_loc, full_output,{ encoding: "utf8", flag: "a+"});
   return;
 }
 
 console.error = function(...args) {
-  let full_output = util.format(...args);
+  let full_output: string = util.format(...args);
   og_error(error_color, full_output, RST);
   let log_date = new Date();
   full_output = `${log_date}: [ERROR] ${full_output}\n`;

@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       home_api(event);
 
     } else if (cur_path === "/mod_list"){ 
-
         console.log("checking if mod change");
         let enable_disable = mod_change(event);
         if (enable_disable) load_mod_list(false, true);
@@ -102,7 +101,7 @@ function mod_change(event) {
     });
     document.getElementById(button_id).disabled = true;
     document.getElementById(button_id).innerText = "...";
-    console.log("sending, ", params.toString());
+    console.log("sending: ", params.toString());
     const api_url = `/api/update_master?${params.toString()}`;
     return send_payload('POST', api_url);
   }
