@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+target_dir="."
+
+extract_api_calls() {
+    local ns=$1
+    echo "=== Unique functions for: ${ns} ==="
+    grep -rhoP "${ns}\.\K[a-zA-Z0-9_]+(?=\s*\()" \
+        --include="*.js" --include="*.ts" "$target_dir" | sort -u
+    echo ""
+}
+
+extract_api_calls "fs"
+extract_api_calls "util"
+extract_api_calls "selectors"

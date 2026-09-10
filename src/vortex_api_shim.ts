@@ -275,7 +275,7 @@ export namespace fs {
 
     // convert the path from windows(\) to unix(/) just in case some paths are hardcoded for some reason;
     let proper_path: string = inp_path;
-    proper_path = proper_path.replace(/\\/g, '/');
+    proper_path = proper_path.replace(/\\/g, path.sep);
     
     const windows_drive = /^[a-zA-Z]:[\\/]/;
     if (windows_drive.test(windows_drive)) {
@@ -316,20 +316,25 @@ export namespace fs {
     dir_path = convert_to_unix(dir_path);
     if (on_dir_created_cb) {
       // create parent directories manually and execute on_dir_created_cb
-      let current_made: string = "";
+      let current_made: string = dir_path.startsWith(path.sep) ? path.sep : "";
       let split_dir: string[] = dir_path.split(path.sep);
+
       for (let i = 0; i < split_dir.length; i++){
+        if (!split_dir[i]) continue;
         current_made = path.join(current_made,split_dir[i]);
-        if (!ofs.existsSync(current_made)){
-          ofs.mkdirSync(current_made);
-          on_dir_created_cb(current_made)
+        try {
+          await ofs.promises.access(current_made);
+        } catch (err) {
+          // The folder doesn't exist, so we create it asynchronously
+          await ofs.promises.mkdir(current_made);
+          // Wait for the callback to fully finish its own promise before moving to the next folder
+          await on_dir_created_cb(current_made);
         }
       }
     } else {
       // just use the build into node one
-      ofs.ensureDir(dir_path);
+      await ofs.ensureDir(dir_path);
     }
-    return;
   }
 
   export async function ensureFileAsync(file_path: string): Promise<void> {
