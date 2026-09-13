@@ -1,0 +1,1 @@
+All files in the bundledplugins/ directory(should be found in either program directory or $HOME/.config/tuxmods directory) were modified from their original Vortex source to include a compiler compatibility line at the top of each file

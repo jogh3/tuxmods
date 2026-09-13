@@ -17,7 +17,8 @@ function sync_pages() {
 }
 
 export let show_color: string | null | undefined = process.env.NO_COLOR || null;
-const debug_mode: string | null | undefined = process.env.debug_mode || null;
+const debug_value: string | null | undefined = process.env.debug_mode || null;
+export const debug_mode: boolean = (debug_value != null && debug_value[0] != '\0') ? true : false;
 
 const all_colors: string[] = ["\x1b[38;5;214m", "\x1b[38;5;45m", "\x1b[2m", "\x1b[38;5;46m",
                             "\x1b[38;5;165m", "\x1b[38;5;93m", "\x1b[38;5;160m", "\x1b[38;5;123m", "\x1b[0m"];
@@ -46,8 +47,6 @@ if ( show_color != null && show_color[0] != '\0') {
 
 const og_log = console.log;
 const og_error = console.error;
-
-debug_log(vdf.get_sgame_info());
 
 export const __filename: string = fileURLToPath(import.meta.url); //setting the filename as different import method
 export const __dirname: string = path.dirname(__filename); // setting the filename as different import method
@@ -155,10 +154,17 @@ console.error = function(...args) {
 
 export function debug_log(...args: any) {
   const message: string = util.format(...args);
-  if (debug_mode != null && debug_mode[0] != '\0'){
+  if (debug_mode){
     console.log(debug_color, message, RST);
   }
   return;
+}
+if (debug_mode) {
+  const old_usage = process.memoryUsage()["heapUsed"];
+  let all_sgame: vdf.sgame_info[] = vdf.get_sgame_info();
+  const new_usage = process.memoryUsage()["heapUsed"];
+  let sgame_total = new_usage - old_usage;
+  debug_log(`total memory of sgame info: ${sgame_total}, roughly for library size of roughly ${all_sgame.length}`);
 }
 
 // this is to check for directory traversal in the requested url for safety purposes

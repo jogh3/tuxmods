@@ -138,7 +138,7 @@ function openacf(acf_path:string): acf {
   return json;
 }
 
-interface sgame_info {
+export interface sgame_info {
   name: string;
   appid: string;
   library_loc: string; // steam library location

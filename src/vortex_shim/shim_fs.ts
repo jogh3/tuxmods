@@ -15,7 +15,9 @@ function convert_to_unix(inp_path: string): string {
   // convert the path from windows(\) to unix(/) just in case some paths are hardcoded for some reason;
   let proper_path: string = inp_path;
   proper_path = proper_path.replace(/\\/g, path.sep);
-  
+
+  //TODO: add functionality to determine if it is the game folder, instead
+
   const windows_drive = /^[a-zA-Z]:[\\/]/;
   if (windows_drive.test(inp_path)) {
 
