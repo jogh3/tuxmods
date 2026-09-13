@@ -58,6 +58,9 @@ export function make_new_profile(){
 function enable_mod(master_list: api.master_format, mod: string): api.master_format {
   let updated_master_list: api.master_format = {...master_list};
   let last_load_order = 0;
+  if (master_list[mod]){
+    return updated_master_list;
+  }
   // loop to get the highest load order from the master list to append
   Object.keys(master_list).forEach((key) => {
     if (master_list[key]!.load_index > last_load_order){
@@ -71,9 +74,12 @@ function enable_mod(master_list: api.master_format, mod: string): api.master_for
 function disable_mod(master_list: api.master_format, mod: string): api.master_format {
   let updated_master_list: api.master_format = {...master_list};
   // load index of the last removed mod
+  if (!master_list[mod]){
+    return updated_master_list;
+  }
   let old_index = master_list[mod]!.load_index;
   delete updated_master_list[mod];
-  // loops through and decrements the load index of each item that was disabled to get rid of gaps
+  // loops through and decrements the load index of each mod that was loaded after the disabled mod to get rid of gaps
   Object.keys(updated_master_list).forEach((key) => {
     if (updated_master_list[key]!.load_index > old_index){
       updated_master_list[key]!.load_index -= 1;
@@ -163,13 +169,22 @@ export function add_game(game_info: any) {
 export function change_current_game(req: http.IncomingMessage, res: http.ServerResponse) {
   let req_url: string = req.url || '';
   const params = api.parse_parameters(req_url);
-  const new_game = params["new_game"]
-  if (!new_game) {
-    console.error("no new game specified");
-    res.writeHead(404);
-    return res.end("false");
-  }
+  let new_game: string | undefined = params["new_game"];
   let config_file: config_format = get_config();
+  if (!new_game) {
+    // if no new game is specified, just choose the first game in the config file
+    console.error("no new game specified");
+    const game_list: string[] = Object.keys(config_file.games);
+    for (let game in game_list){
+      if (!game){
+        new_game = game;
+        break;
+      }
+    }
+  }
+  if (!new_game){
+    new_game = "no game specified";
+  }
   config_file.global_data.current_game = new_game;
   const raw_config = JSON.stringify(config_file);
   fs.writeFileSync(index.config_file, raw_config, { encoding: "utf8", flag: "w" });

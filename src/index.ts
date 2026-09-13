@@ -11,6 +11,10 @@ import * as util from 'util';
 import * as api from './api.js';
 import * as vdf from './vdf_parser.js'
 
+let sync_clients: http.ServerResponse[] = [];
+function sync_pages() {
+  sync_clients.forEach(client => client.write("data: refresh\n\n"));
+}
 
 export let show_color: string | null | undefined = process.env.NO_COLOR || null;
 const debug_mode: string | null | undefined = process.env.debug_mode || null;
@@ -103,27 +107,22 @@ async function check_log_size() {
   const file_info = await stat(log_file_loc);
   const total_bytes = file_info.size;
 
-  if (total_bytes > max_log_size) {
+  if (total_bytes >= max_log_size) {
     await unlink(log_file_loc);
   }
 }
 
 await check_log_size();
 
-function get_custom_date(oDate: Date) {
-    let sDate: string = "";
-    if (oDate instanceof Date) {
-        sDate = oDate.getFullYear() + 1900
-            + ':'
-            + ((oDate.getMonth() + 1 < 10) ? '0' + (oDate.getMonth() + 1) : oDate.getMonth() + 1)
-            + ':' + oDate.getDate()
-            + ':' + oDate.getHours()
-            + ':' + ((oDate.getMinutes() < 10) ? '0' + (oDate.getMinutes()) : oDate.getMinutes())
-            + ':' + ((oDate.getSeconds() < 10) ? '0' + (oDate.getSeconds()) : oDate.getSeconds());
-    } else {
-        throw new Error("oDate is not an instance of Date");
-    }
-    return sDate;
+function get_custom_date(odate: Date): string {
+    const year = String(odate.getFullYear());
+    const month = String(odate.getMonth()+1).padStart(2,'0');
+    const day = String(odate.getDate()).padStart(2,'0');
+    const hour = String(odate.getHours()).padStart(2,'0');
+    const minutes = String(odate.getMinutes()).padStart(2,'0');
+    const seconds = String(odate.getSeconds()).padStart(2,'0');
+    let sdate: string = `${year}:${month}:${day}:${hour}:${minutes}:${seconds}`;
+    return sdate;
 }
 
 function strip_color(log: string): string {
@@ -136,8 +135,8 @@ function strip_color(log: string): string {
 console.log = function(...args) {
   let full_msg: string = util.format(...args);
   og_log(full_msg);
-  let curr_date = new Date();
-  let log_date = curr_date;
+  let curr_date: Date = new Date();
+  let log_date = get_custom_date(curr_date);
   let stripped_msg: string = strip_color(full_msg);
   let full_output = `${log_date}: ${stripped_msg}\n`;
   fs.writeFileSync(log_file_loc, full_output,{ encoding: "utf8", flag: "a+"});
@@ -147,8 +146,9 @@ console.log = function(...args) {
 console.error = function(...args) {
   let full_output: string = util.format(...args);
   og_error(error_color, full_output, RST);
-  let log_date = new Date();
-  full_output = `${log_date}: [ERROR] ${full_output}\n`;
+  let curr_date: Date = new Date()
+  let log_date: string = get_custom_date(curr_date);
+  full_output = `${log_date} [ERROR]: ${full_output}\n`;
   fs.writeFileSync(log_file_loc, full_output, {encoding: "utf8", flag: "a+"});
   return;
 }
@@ -223,6 +223,19 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
 
   // 1. intercept api calls first
   if (safe_url.startsWith('/api/')) {
+    if (safe_url === '/api/sync') {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+      });
+      sync_clients.push(res);
+      req.on('close', () => {
+        const idx = sync_clients.indexOf(res);
+        if (idx !== -1) sync_clients.splice(idx, 1);
+      }); 
+      return; // Stop execution here for sync clients
+    }
     const command: string = safe_url.split('?')[0]!.split('/').pop() || '';
     
     if (method === 'GET') {
@@ -236,7 +249,10 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
       }
     } else if (method === 'POST') {
       console.log(POST_color, 'POST request', safe_url, RST);
-      const handler: any = api.postroutes[command]; 
+      const handler: any = api.postroutes[command];
+      res.on('finish', () => {
+        if (res.statusCode === 200) sync_pages();
+      });
       if (handler){ 
         return handler(req, res); 
       } else {

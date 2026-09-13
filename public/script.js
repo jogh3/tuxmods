@@ -15,15 +15,26 @@ async function get_current_game() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  game_to_mod = await get_current_game();
-  console.log("game to mod is:", game_to_mod);
-  // all the sidebar buttons, and their associated functions
   const sidebar_buttons = {
     "home": load_main,
     "settings": load_settings,
     "mod_list": load_mod_list,
     "load_order": load_load_order
   }
+  const evtSource = new EventSource("/api/sync");
+  evtSource.onmessage = (event) => {
+    if (event.data === "refresh") {
+      console.log("sync request recieved, refreshing");
+      // reload the page to ensure a full sync with the server for other connection
+      location.reload();
+    }
+  }
+  game_to_mod = await get_current_game();
+  if (game_to_mod === "no game specified") {
+    window.alert("no game specified in config, so no return");
+  }
+  console.log("game to mod is:", game_to_mod);
+  // all the sidebar buttons, and their associated functions
   console.log(window.location.pathname);
   const raw_path = window.location.pathname;
   let start_page = raw_path === "/" ? "home" : raw_path.slice(1); // defaults to home if it is just slash, otherwise removes the starting /

@@ -13,3 +13,4 @@ extract_api_calls() {
 extract_api_calls "fs"
 extract_api_calls "util"
 extract_api_calls "selectors"
+extract_api_calls "actions"
