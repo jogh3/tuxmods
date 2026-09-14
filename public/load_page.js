@@ -29,10 +29,9 @@ function load_settings(is_pop_state = false) {
   return;
 }
 
-
-async function fetch_mod_list(target_game){
+async function fetch_mod_list(){
   const params = new URLSearchParams({ // generate the api request parameters
-    game: target_game
+    game: game_to_mod
   });
   console.log("sending, ", params.toString());
   const api_url = `/api/get_mod_list?${params.toString()}`;
@@ -87,7 +86,7 @@ async function load_mod_list(is_pop_state = false, is_refresh = false) {
   if (!is_pop_state) {
     history.pushState({ page: "mod_list" }, "", "/mod_list");
   }
-  let mod_list = await fetch_mod_list(game_to_mod);
+  let mod_list = await fetch_mod_list();
   if (!mod_list) {
     console.log("no mods returned");
     main_body.innerHTML = `<h2> no mods returned </h2>`;

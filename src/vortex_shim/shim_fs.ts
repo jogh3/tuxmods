@@ -1,6 +1,5 @@
 import * as ofs from 'fs-extra';
 import * as path from 'path';
-import { createHash } from 'node:crypto';
 import * as os from 'os';
 
 import * as index from '../index.js'
@@ -16,7 +15,7 @@ function convert_to_unix(inp_path: string): string {
   let proper_path: string = inp_path;
   proper_path = proper_path.replace(/\\/g, path.sep);
 
-  //TODO: add functionality to determine if it is the game folder, instead
+  //TODO: add functionality to determine if it is the game folder, instead of a proton system, i guess, maybe not necessary
 
   const windows_drive = /^[a-zA-Z]:[\\/]/;
   if (windows_drive.test(inp_path)) {

@@ -159,6 +159,7 @@ export function debug_log(...args: any) {
   }
   return;
 }
+
 if (debug_mode) {
   const old_usage = process.memoryUsage()["heapUsed"];
   let all_sgame: vdf.sgame_info[] = vdf.get_sgame_info();

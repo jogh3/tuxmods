@@ -1,4 +1,4 @@
-let game_to_mod =""; //"The Elder Scrolls V: Skyrim Special Edition";
+let game_to_mod ="";
 
 async function get_current_game() {
   let returned_game = "";
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     "mod_list": load_mod_list,
     "load_order": load_load_order
   }
+
   const evtSource = new EventSource("/api/sync");
   evtSource.onmessage = (event) => {
     if (event.data === "refresh") {
@@ -29,16 +30,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       location.reload();
     }
   }
+
   game_to_mod = await get_current_game();
   if (game_to_mod === "no game specified") {
     window.alert("no game specified in config, so no return");
   }
   console.log("game to mod is:", game_to_mod);
+
   // all the sidebar buttons, and their associated functions
   console.log(window.location.pathname);
   const raw_path = window.location.pathname;
   let start_page = raw_path === "/" ? "home" : raw_path.slice(1); // defaults to home if it is just slash, otherwise removes the starting /
   start_page = sidebar_buttons[start_page];
+
   if (start_page){
     start_page(true);
   } else {
@@ -49,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // checks if the load is from pressing a back or forward button in the browser
   window.addEventListener('popstate', (event) => {
-    const page_to_load = event.state && event.state.page ? event.state.page : 'home';
+    const page_to_load = (event.state && event.state.page) ? event.state.page : 'home';
     
     console.log("navigation detected. Loading:", page_to_load);
     
@@ -67,13 +71,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let cur_path = window.location.pathname;
     
-    if (cur_path == "/" || cur_path == "home") {
+    if (cur_path == "/" || cur_path == "/home") {
       home_api(event);
-
     } else if (cur_path === "/mod_list"){ 
         console.log("checking if mod change");
         let enable_disable = mod_change(event);
         if (enable_disable) load_mod_list(false, true);
+        // do stuff for reinstall and other parts of the mod_list that can be done
       }
   })
 });

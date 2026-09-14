@@ -113,12 +113,12 @@ export function update_master(req: http.IncomingMessage, res: http.ServerRespons
     res.writeHead(404);
     return res.end("false");
   }
-  let mod = '';
+  let mod: string = '';
   let mod_reqd: boolean = false
   // param format will be different for enable/disable & reinstall compared to change load order
-  if (action == "enable_mod" || "disable_mod" || "reinstall"){
+  if (action === "enable_mod" || action === "disable_mod" || action === "reinstall"){
     mod = params["mod"] || '';
-    mod_reqd = true
+    mod_reqd = true;
   }
   if (!mod && mod_reqd) {
     console.error("invalid mod");
@@ -136,8 +136,8 @@ export function update_master(req: http.IncomingMessage, res: http.ServerRespons
     master_list = reinstall_mod(master_list, mod);
   }
   const full_master_path: string = path.join(index.config_dir,game,"master_list.json");
-  const raw_master = JSON.stringify(master_list)
-  fs.writeFileSync(full_master_path, raw_master, { encoding: "utf8", flag: "w" })
+  const raw_master = JSON.stringify(master_list);
+  fs.writeFileSync(full_master_path, raw_master, { encoding: "utf8", flag: "w" });
   res.writeHead(200);
   return res.end("true");
 }
@@ -157,7 +157,7 @@ export function load_profile(){
 
 // saves the profile sync from the api, to the file
 function write_profile_sync(requrl: string, profile_info: api.master_format) {
-
+  return;
 }
 
 // adds a game to the config file+makes the directory
@@ -165,6 +165,7 @@ export function add_game(game_info: any) {
   // gotta create staging dir as well as well as a new default profile
   return;
 }
+
 // changes the currently modding game in the config file
 export function change_current_game(req: http.IncomingMessage, res: http.ServerResponse) {
   let req_url: string = req.url || '';
