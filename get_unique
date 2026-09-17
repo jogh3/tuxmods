@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-target_dir="."
-
+target_dir="${1:-/home/joe/Documents/code/tuxmods/bundledPlugins/}"
+target_dir=$(realpath $target_dir)
 extract_api_calls() {
     local ns=$1
     echo "=== Unique functions for: ${ns} ==="
@@ -14,3 +14,4 @@ extract_api_calls "fs"
 extract_api_calls "util"
 extract_api_calls "selectors"
 extract_api_calls "actions"
+extract_api_calls "types"

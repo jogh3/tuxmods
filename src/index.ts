@@ -107,7 +107,12 @@ async function check_log_size() {
   const total_bytes = file_info.size;
 
   if (total_bytes >= max_log_size) {
-    await unlink(log_file_loc);
+    await fs.rm(log_file_loc, (err) => {
+      if (err) {
+        console.error("failed to delete log");
+        return;
+      }
+    });
   }
 }
 

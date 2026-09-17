@@ -102,7 +102,7 @@ export function getVortexPath(id: keyof VortexPaths): string {
       vortex_path = path.join(user_base, "Desktop");
       break;
     case "bundledPlugins":
-      // TODO: when making makefile ensure a copy for the bundledPlugins dir to the config folder
+      // TODO: when making makefile ensure to move the bundledPlugins dir to the config folder
       vortex_path = path.join(index.config_dir, "bundledPlugins");
       break;
     case "temp":
