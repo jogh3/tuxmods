@@ -36,7 +36,7 @@ function convert_to_unix(inp_path: string): string {
   return path.normalize(proper_path);
 }
 
-export async function readFileAsync(f: string, options?: any): Promise<string>{
+export async function readFileAsync(f: string, options?: any): Promise<string> {
   f = convert_to_unix(f);
   return ofs.promises.readFile(f, { encoding: 'utf8', ...options }) as unknown as Promise<string>;
 }

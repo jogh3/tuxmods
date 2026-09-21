@@ -153,7 +153,7 @@ export function deepMerge(a: any, b: any) {
   return result;
 }
 
-function setdefault(obj: any, key: any, def: any){
+export function setdefault(obj: any, key: any, def: any){
   if (!obj[key]){
     obj[key]=def
   }
@@ -199,22 +199,6 @@ export function makeoverlayabledictionary<keyt extends string | number | symbol,
 export function fileMD5(path: string): string {
   let raw_data: string = ofs.readFileSync(path).toString();
   return createHash('md5').update(raw_data).digest('hex');
-}
-
-export function getErrorCode(err: unknown): string | null {
-  if (!(err instanceof Error)) {
-    return null;
-  }
-
-  if (!("code" in err)) {
-    return null;
-  }
-
-  if (typeof err.code !== "string") {
-    return null;
-  }
-
-  return err.code;
 }
 
 export async function walk(target: string, callback: (iterPath: string, stats: ofs.Stats) => PromiseLike<any>,options?: any,): Promise<void> {
