@@ -102,13 +102,18 @@ export function getVortexPath(id: keyof VortexPaths): string {
       vortex_path = path.join(user_base, "Desktop");
       break;
     case "bundledPlugins":
-      // TODO: when making makefile ensure to move the bundledPlugins dir to the config folder
-      vortex_path = path.join(index.config_dir, "bundledPlugins");
+      const config_plugins = path.join(index.config_dir, "bundledPlugins");
+      if (ofs.existsSync(config_plugins)) {
+        vortex_path = config_plugins;
+      } else {
+        vortex_path = path.join("","usr","local","lib","tuxmods","bundledPlugins");
+      }
       break;
     case "temp":
       vortex_path = os.tmpdir();
       break;
     case "userData":
+      // this is where external Extensions are located
       vortex_path = path.join(index.config_dir, "user_data");
       break;
     default:

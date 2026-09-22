@@ -17,12 +17,14 @@ function convert_to_unix(inp_path: string): string {
 
   //TODO: add functionality to determine if it is the game folder, instead of a proton system, i guess, maybe not necessary
 
+  let config_game: string = config.return_game();
+
+  let config_data: config.config_format = config.get_config();
+
+  let game_loc: string = config_data.games[config_game]!.game_loc;
+
   const windows_drive = /^[a-zA-Z]:[\\/]/;
   if (windows_drive.test(inp_path)) {
-
-    let config_game: string = config.return_game();
-
-    let config_data: config.config_format = config.get_config();
 
     let proton_loc: string = config_data.games[config_game]!.proton_loc;
 
@@ -36,8 +38,17 @@ function convert_to_unix(inp_path: string): string {
   return path.normalize(proper_path);
 }
 
+function make_fs_error(message: string, code: string) {
+  const err = new Error(message) as Error & { code: string };
+  err.code = code;
+  return err;
+}
+
 export async function readFileAsync(f: string, options?: any): Promise<string> {
   f = convert_to_unix(f);
+  if (!(await ofs.pathExists(f))) {
+    throw make_fs_error(`file ${f} doesn't exist, cannot read`, 'ENOENT')
+  }
   return ofs.promises.readFile(f, { encoding: 'utf8', ...options }) as unknown as Promise<string>;
 }
 
@@ -48,6 +59,9 @@ export async function writeFileAsync(file: string,data: any, options?: ofs.Write
 
 export async function readdirAsync(dir: string): Promise<string[]>{
   dir = convert_to_unix(dir);
+  if (!(await ofs.pathExists(dir))) {
+    throw make_fs_error(`directory ${dir} does not exist, cannot read`, 'ENOENT');
+  }
   return ofs.promises.readdir(dir);
 }
 
@@ -97,3 +111,26 @@ export async function lstatAsync(target_path: string): Promise<Stats> {
   target_path = convert_to_unix(target_path);
   return ofs.promises.lstat(target_path);
 }
+
+export async function chmodAsync(path: string, mode: string | number): Promise<void> {
+  path = convert_to_unix(path);
+  return ofs.promises.chmod(path, mode).catch((err) => console.error(err));
+}
+
+export async function closeSync(fd: string){}
+
+type CopyOptionsEx = ofs.CopyOptions & {
+  noSelfCopy?: boolean;
+  showDialogCallback?: () => boolean;
+};
+export async function copyAsync(src: string, dest: string, options?: CopyOptionsEx): Promise<void> {
+  src = convert_to_unix(src);
+  if (!(await ofs.pathExists(src))) {
+    throw make_fs_error(`src ${src} does not exist, cannot copy`, 'ENOENT');
+  }
+  dest = convert_to_unix(dest);
+  return ofs.copy(src,dest,options);
+}
+
+export const createReadStream = ofs.createReadStream;
+export const createWriteStream = ofs.createWriteStream;

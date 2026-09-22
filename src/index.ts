@@ -84,6 +84,10 @@ export const config_dir: string = path.join(os.homedir(), '.config', 'tuxmods');
 export const config_file: string = path.join(config_dir, 'config.json');
 const public_dir: string = path.join(__dirname, '..', 'public'); // path to the frontend of the daemon
 
+if (!fs.existsSync(config_dir)) {
+  fs.mkdirSync(config_dir, true);
+}
+
 // record for what to display for each file type that could be served
 export const file_types: Record<string, string> = {
   '.html': 'text/html',
