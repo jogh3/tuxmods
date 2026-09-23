@@ -8,7 +8,9 @@ this is a mod manager for linux that uses the deployment methods for vortex made
 
 to build the program
 
-> make build
+```
+ make build
+```
 
 to install it, which includes:
  
@@ -16,23 +18,33 @@ to install it, which includes:
  - moving the other files to /usr/local/lib/tuxmods
  - adding a systemd service
 
-> make install
+```
+ make install
+```
 
 to build it as a single executable application
 
-> make sea-build
+```
+ make sea-build
+```
 
 to build it with dev info, to include the source maps and with strict compilation
 
-> make dev-build
+```
+ make dev-build
+```
 
 to uninstall the program, undoing all that make install does
 
-> make uninstall
+```
+ make uninstall
+```
 
 to clean the build
 
-> make clean
+```
+make clean
+```
 
 # License Information
 
