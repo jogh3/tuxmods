@@ -7,9 +7,14 @@ import * as path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import * as os from 'os';
 import * as util from 'util';
+import { getAsset } from 'node:sea';
+import admzip from 'adm-zip';
 
 import * as api from './api.js';
 import * as vdf from './vdf_parser.js'
+import './mod_manger.js'
+import './vortex_api_shim.js'
+import './win_api_shim.js'
 
 let sync_clients: http.ServerResponse[] = [];
 function sync_pages() {
@@ -85,7 +90,7 @@ export const config_file: string = path.join(config_dir, 'config.json');
 const public_dir: string = path.join(__dirname, '..', 'public'); // path to the frontend of the daemon
 
 if (!fs.existsSync(config_dir)) {
-  fs.mkdirSync(config_dir, true);
+  fs.mkdirSync(config_dir, {recursive: true});
 }
 
 // record for what to display for each file type that could be served
@@ -169,12 +174,13 @@ export function debug_log(...args: any) {
   return;
 }
 
-if (debug_mode) {
+export function check_heap() {
   const old_usage = process.memoryUsage()["heapUsed"];
   let all_sgame: vdf.sgame_info[] = vdf.get_sgame_info();
   const new_usage = process.memoryUsage()["heapUsed"];
   let sgame_total = new_usage - old_usage;
   debug_log(`total memory of sgame info: ${sgame_total}, roughly for library size of roughly ${all_sgame.length}`);
+  return;
 }
 
 // this is to check for directory traversal in the requested url for safety purposes
@@ -187,6 +193,18 @@ export function is_directory_traversal(requested_path : string, acceptable: stri
   }
   return false;
 }
+
+function check_bundledplugins() {
+  const sea_path = path.join(config_dir, "bundledPlugins");
+  if (!fs.existsSync(sea_path)) {
+    const archive_buffer = getAsset("plugins.zip");
+    const zip = new admzip(Buffer.from(archive_buffer));
+    zip.extractAllTo(path.resolve(sea_path), true);
+  }
+  return;
+}
+
+check_bundledplugins();
 
 // separated static file and spa fallback logic
 function serve_static(req: http.IncomingMessage, res: http.ServerResponse, safe_url: string) {

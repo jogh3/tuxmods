@@ -102,11 +102,17 @@ export function getVortexPath(id: keyof VortexPaths): string {
       vortex_path = path.join(user_base, "Desktop");
       break;
     case "bundledPlugins":
+      // bundledPlugins will be located in config dir if running from SEA
+      // but is in the libdir if installed
+      // and in the running dir if only built
       const config_plugins = path.join(index.config_dir, "bundledPlugins");
+      const lib_plugins = path.join("","usr","local","lib","tuxmods","bundledPlugins");
       if (ofs.existsSync(config_plugins)) {
         vortex_path = config_plugins;
+      } else if (ofs.existsSync(lib_plugins)) {
+        vortex_path = lib_plugins;
       } else {
-        vortex_path = path.join("","usr","local","lib","tuxmods","bundledPlugins");
+        vortex_path = path.join(index.__dirname,"bundledPlugins");
       }
       break;
     case "temp":

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=tuxmods
+Comment=Linux mod manager
+Exec=
+Icon=
+Categories=Game;Utility;
+Terminal=true

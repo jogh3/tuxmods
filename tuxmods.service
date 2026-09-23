@@ -1,0 +1,18 @@
+[Unit]
+Description=tuxmods daemon
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/tuxmods
+Restart=on-failure
+RestartSec=5s
+
+# Security sandboxing
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/tuxmods
+
+[Install]
+WantedBy=multi-user.target

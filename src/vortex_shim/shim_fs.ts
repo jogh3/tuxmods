@@ -117,8 +117,6 @@ export async function chmodAsync(path: string, mode: string | number): Promise<v
   return ofs.promises.chmod(path, mode).catch((err) => console.error(err));
 }
 
-export async function closeSync(fd: string){}
-
 type CopyOptionsEx = ofs.CopyOptions & {
   noSelfCopy?: boolean;
   showDialogCallback?: () => boolean;
@@ -132,5 +130,6 @@ export async function copyAsync(src: string, dest: string, options?: CopyOptions
   return ofs.copy(src,dest,options);
 }
 
-export const createReadStream = ofs.createReadStream;
-export const createWriteStream = ofs.createWriteStream;
+export let createReadStream = ofs.createReadStream;
+export let createWriteStream = ofs.createWriteStream;
+export let closeSync = ofs.closeSync
