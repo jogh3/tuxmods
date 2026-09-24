@@ -7,6 +7,12 @@ import * as config from '../config_manager.js';
 
 export import Stats = ofs.Stats;
 
+export let {
+createReadStream,
+createWriteStream,
+closeSync
+} = ofs;
+
 // insurance in case a script has any hardcoded paths, unlikely but still a good insurance
 function convert_to_unix(inp_path: string): string {
   if (!inp_path) return "";
@@ -129,7 +135,40 @@ export async function copyAsync(src: string, dest: string, options?: CopyOptions
   dest = convert_to_unix(dest);
   return ofs.copy(src,dest,options);
 }
+const retry_errors = new Set(["EBUSY", "ETXTBSY", "EAGAIN"])
+const delay = (ms: number = 100) => new Promise((resolve) => setTimeout(resolve,ms));
 
-export let createReadStream = ofs.createReadStream;
-export let createWriteStream = ofs.createWriteStream;
-export let closeSync = ofs.closeSync
+export async function forcePerm<T>(t: tFunction,op: () => Promise<T>, file_path?: string, max_tries: number = 3): Promise<T> {
+  let attempts: number = 0;
+  let fixed_perms: boolean = false;
+
+  while (true) {
+    try {
+      return await op()
+    } catch (err: any) {
+      const error_code = err?.code;
+      const raw_path = file_path ?? err?.path;
+      const target = raw_path ? convert_to_unix(raw_path) : undefined;
+
+      if ((error_code === "EPERM" || error_code === "EACCES") && !fixed_perms) {
+        if (target && (await ofs.pathExists(target))) {
+          try {
+            const stat = await ofs.promises.stat(target);
+            const wanted_mode = stat.isDirectory() ? 0o755 : 0o644;
+            await ofs.promises.chmod(target, wanted_mode);
+            fixed_perms = true;
+            continue;
+          } catch {
+            throw err;
+          }
+        }
+      }
+      if (retry_errors.has(error_code) && attempts < max_tries) {
+        attempts++;
+        await delay();
+        continue;
+      }
+      throw err;
+    }
+  }
+}

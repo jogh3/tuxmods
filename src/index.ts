@@ -7,7 +7,7 @@ import * as path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import * as os from 'os';
 import * as util from 'util';
-import { getAsset } from 'node:sea';
+import { getAsset, isSea } from 'node:sea';
 import admzip from 'adm-zip';
 
 import * as api from './api.js';
@@ -196,7 +196,7 @@ export function is_directory_traversal(requested_path : string, acceptable: stri
 
 function check_bundledplugins() {
   const sea_path = path.join(config_dir, "bundledPlugins");
-  if (!fs.existsSync(sea_path)) {
+  if (!fs.existsSync(sea_path) || isSea()) {
     const archive_buffer = getAsset("plugins.zip");
     const zip = new admzip(Buffer.from(archive_buffer));
     zip.extractAllTo(path.resolve(sea_path), true);

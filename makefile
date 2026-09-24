@@ -16,7 +16,7 @@ build:
 	echo "moving bundledPlugins"
 	cp -r bundledPlugins build/
 
-# install: all
+install: all
 # 	echo "creating directories"
 # 	install -d $(DESTDIR)$(libdir)
 # 	install -d $(DESTDIR)$(bindir)

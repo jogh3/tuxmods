@@ -19,8 +19,11 @@ to install it, which includes:
  - adding a systemd service
 
 ```
- make install
+ make build
+ sudo make install
+ sudo systemctl enable --now tuxmods.service
 ```
+## make install does nothing as of the moment
 
 to build it as a single executable application
 

@@ -4,5 +4,6 @@ Name=tuxmods
 Comment=Linux mod manager
 Exec=
 Icon=
-Categories=Game;Utility;
+Categories=Game;Utility;ConsoleOnly
 Terminal=true
+MimeType=x-scheme-handler/nxm;
