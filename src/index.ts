@@ -125,7 +125,7 @@ async function check_log_size() {
   }
 }
 
-await check_log_size();
+(async () => await check_log_size())
 
 function get_custom_date(odate: Date): string {
     const year = String(odate.getFullYear());
@@ -174,12 +174,15 @@ export function debug_log(...args: any) {
   return;
 }
 
-export function check_heap() {
+export function check_heap<T extends (...args: any[]) => any>(mem_func: T, ...args: Parameters<T>) {
+  if (global.gc) {
+    global.gc();
+  }
   const old_usage = process.memoryUsage()["heapUsed"];
-  let all_sgame: vdf.sgame_info[] = vdf.get_sgame_info();
+  let func_data = mem_func();
   const new_usage = process.memoryUsage()["heapUsed"];
-  let sgame_total = new_usage - old_usage;
-  debug_log(`total memory of sgame info: ${sgame_total}, roughly for library size of roughly ${all_sgame.length}`);
+  let mem_diff = new_usage - old_usage;
+  debug_log(`heap delta: ${(mem_diff / 1024 / 1024).toFixed(2)} MB (${mem_diff} bytes)`);
   return;
 }
 

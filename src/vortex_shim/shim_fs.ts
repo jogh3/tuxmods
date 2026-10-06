@@ -5,16 +5,16 @@ import * as os from 'os';
 import * as index from '../index.js'
 import * as config from '../config_manager.js';
 
+export * from './fs_re-export.js';
+
 export import Stats = ofs.Stats;
 
 export let {
-createReadStream,
-createWriteStream,
 closeSync
 } = ofs;
 
 // insurance in case a script has any hardcoded paths, unlikely but still a good insurance
-function convert_to_unix(inp_path: string): string {
+export function convert_to_unix(inp_path: string): string {
   if (!inp_path) return "";
 
   // convert the path from windows(\) to unix(/) just in case some paths are hardcoded for some reason;
@@ -44,31 +44,10 @@ function convert_to_unix(inp_path: string): string {
   return path.normalize(proper_path);
 }
 
-function make_fs_error(message: string, code: string) {
+export function make_fs_error(message: string, code: string) {
   const err = new Error(message) as Error & { code: string };
   err.code = code;
   return err;
-}
-
-export async function readFileAsync(f: string, options?: any): Promise<string> {
-  f = convert_to_unix(f);
-  if (!(await ofs.pathExists(f))) {
-    throw make_fs_error(`file ${f} doesn't exist, cannot read`, 'ENOENT')
-  }
-  return ofs.promises.readFile(f, { encoding: 'utf8', ...options }) as unknown as Promise<string>;
-}
-
-export async function writeFileAsync(file: string,data: any, options?: ofs.WriteFileOptions): Promise<void> {
-  file = convert_to_unix(file);
-  return ofs.promises.writeFile(file, data, options);
-}
-
-export async function readdirAsync(dir: string): Promise<string[]>{
-  dir = convert_to_unix(dir);
-  if (!(await ofs.pathExists(dir))) {
-    throw make_fs_error(`directory ${dir} does not exist, cannot read`, 'ENOENT');
-  }
-  return ofs.promises.readdir(dir);
 }
 
 export async function ensureDirAsync(dir_path: string, on_dir_created_cb?: (created: string) => PromiseLike<void>): Promise<void> {
@@ -96,11 +75,6 @@ export async function ensureDirAsync(dir_path: string, on_dir_created_cb?: (crea
   }
 }
 
-export async function ensureFileAsync(file_path: string): Promise<void> {
-  file_path = convert_to_unix(file_path);
-  return Promise.resolve(ofs.ensureFile(file_path));
-}
-
 export async function ensureDirWritableAsync(dir_path: string, confirm?: () => PromiseLike<void>): Promise<void> {
   dir_path = convert_to_unix(dir_path);
   try {
@@ -111,16 +85,6 @@ export async function ensureDirWritableAsync(dir_path: string, confirm?: () => P
     console.error(`[Vortex Shim] ensureDirWritableAsync failed for ${dir_path}`);
     throw err;
   }
-}
-
-export async function lstatAsync(target_path: string): Promise<Stats> {
-  target_path = convert_to_unix(target_path);
-  return ofs.promises.lstat(target_path);
-}
-
-export async function chmodAsync(path: string, mode: string | number): Promise<void> {
-  path = convert_to_unix(path);
-  return ofs.promises.chmod(path, mode).catch((err) => console.error(err));
 }
 
 type CopyOptionsEx = ofs.CopyOptions & {
@@ -135,13 +99,14 @@ export async function copyAsync(src: string, dest: string, options?: CopyOptions
   dest = convert_to_unix(dest);
   return ofs.copy(src,dest,options);
 }
+
 const retry_errors = new Set(["EBUSY", "ETXTBSY", "EAGAIN"])
 const delay = (ms: number = 100) => new Promise((resolve) => setTimeout(resolve,ms));
+type tFunction = (...args: any[]) => any;
 
 export async function forcePerm<T>(t: tFunction,op: () => Promise<T>, file_path?: string, max_tries: number = 3): Promise<T> {
   let attempts: number = 0;
   let fixed_perms: boolean = false;
-
   while (true) {
     try {
       return await op()

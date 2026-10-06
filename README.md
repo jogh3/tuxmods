@@ -25,12 +25,6 @@ to install it, which includes:
 ```
 ## make install does nothing as of the moment
 
-to build it as a single executable application
-
-```
- make sea-build
-```
-
 to build it with dev info, to include the source maps and with strict compilation
 
 ```

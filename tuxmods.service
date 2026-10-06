@@ -11,7 +11,7 @@ RestartSec=5s
 # Security sandboxing
 NoNewPrivileges=true
 ProtectSystem=strict
-ProtectHome=read-only
+# ProtectHome=read-only
 ReadWritePaths=/var/lib/tuxmods
 
 [Install]
