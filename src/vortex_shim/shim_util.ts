@@ -138,25 +138,54 @@ export function getSafe(state: any, path: Array<string | number | undefined>, de
 function pick(lhs: any, rhs: any): any {
   return lhs === undefined ? rhs : lhs;
 }
+
+// helper to strictly identify plain objects (excluding arrays and nulls)
+function isobject(item: any): boolean {
+  return item !== null && typeof item === "object" && !Array.isArray(item);
+}
+
 // a = lhs, b = rhs
-export function deepMerge(a: any, b: any) {
-  if (a === undefined){
-    return b;
-  } else if (b === undefined){
-    return a;
+export function deepmerge(a: any, b: any): any {
+  if (a === undefined) return b;
+  if (b === undefined) return a;
+  
+  // if they aren't both objects, fall back to pick immediately
+  if (!isobject(a) || !isobject(b)) {
+    return pick(b, a);
   }
+
   const result: any = {};
-  for ( const key of Object.keys(a).concat(Object.keys(b))) {
-    if (a[key] === undefined || b[key] === undefined) {
-      result[key] = () => a === undefined ? b : a; 
+  const stack = [{ target: result, source_a: a, source_b: b }];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (!current) continue;
+
+    const { target, source_a, source_b } = current;
+    
+    // combine keys from both objects without duplicates
+    const keys = Array.from(new Set([...Object.keys(source_a), ...Object.keys(source_b)]));
+
+    for (const key of keys) {
+      const val_a = source_a[key];
+      const val_b = source_b[key];
+
+      // condition 1: both are plain objects -> push to stack for next iteration
+      if (isobject(val_a) && isobject(val_b)) {
+        target[key] = {};
+        stack.push({ target: target[key], source_a: val_a, source_b: val_b });
+      } 
+      // condition 2: both are arrays -> concatenate
+      else if (Array.isArray(val_a) && Array.isArray(val_b)) {
+        target[key] = val_a.concat(val_b);
+      } 
+      // condition 3: mixed types or primitives -> pick right-hand side over left-hand side
+      else {
+        target[key] = pick(val_b, val_a);
+      }
     }
-    result[key] = 
-      typeof a[key] === "object" && typeof b[key] === "object"
-        ? (result[key] = deepMerge(a[key],b[key]))
-        : Array.isArray(a[key]) && Array.isArray(b[key])
-          ? (result[key] = a[key].concat(b[key]))
-          : (result[key] = pick(b[key], a[key]));
   }
+
   return result;
 }
 

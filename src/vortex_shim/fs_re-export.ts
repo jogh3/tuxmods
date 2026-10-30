@@ -3,6 +3,7 @@ import * as path from 'path';
 
 import {convert_to_unix, make_fs_error} from './shim_fs.js';
 
+export import Stats = ofs.Stats;
 // this file is for standard fs functions that are just returned
 
 export function createReadStream(path: string, options: any) {
@@ -83,24 +84,104 @@ export async function openAsync(path: string, flags: string | number,  mode?: nu
   }
   return ofs.open(path, flags,mode);
 }
-export async function openSync(path: string, flags: string | number, mode?: number): number {
+export function openSync(path: string, flags: string | number, mode?: number): number | null {
   path = convert_to_unix(path)
-  if (!(await ofs.pathExists(path))) {
-    throw make_fs_error(`path ${path} does not exist cannot open`, 'ENOENT');
+  if (!ofs.existsSync(path)) {
+    console.error(`path ${path} does not exist cannot open`);
+    return null;
   }
   return ofs.openSync(path, flags,mode);
 }
-export function readdirSync(path: string): Promise<string[]> {
+export function readdirSync(path: string): string[] | null {
   path = convert_to_unix(path);
   if (ofs.existsSync(path)) {
-    throw make_fs_error(`dir ${path} does not exist, cannot read`, 'ENOENT');
+    console.error(`dir ${path} does not exist, cannot read`);
+    return null;
   }
   return ofs.readdirSync(path);
 }
-export function readFileSync(path: string): Promise<string> {
+export function readFileSync(path: string): Buffer | string | null {
   path = convert_to_unix(path);
   if (ofs.existsSync(path)) {
-    throw make_fs_error(`file ${path} does not exist, cannot read`, 'ENOENT');
+    console.error(`file ${path} does not exist, cannot read`);
+    return null;
   }
   return ofs.readFileSync(path);
+}
+export function closeSync(fd: number): void {
+  return ofs.closeSync(fd);
+}
+
+export async function removeAsync(dir_path: string, options?: ofs.RemoveOptions): Promise<void> {
+  dir_path = convert_to_unix(dir_path);
+  return ofs.remove(dir_path, options);
+}
+
+export function removeSync(dir_path: string): void {
+  dir_path = convert_to_unix(dir_path);
+  return ofs.removeSync(dir_path);
+}
+
+export async function renameAsync(old_path: string, new_path: string): Promise<void> {
+  old_path = convert_to_unix(old_path);
+  new_path = convert_to_unix(new_path);
+  return ofs.promises.rename(old_path, new_path);
+}
+
+export async function rmdirAsync(dir_path: string): Promise<void> {
+  dir_path = convert_to_unix(dir_path);
+  return ofs.promises.rmdir(dir_path);
+}
+
+export function rmdirSync(dir_path: string): void {
+  dir_path = convert_to_unix(dir_path);
+  if (!ofs.existsSync(dir_path)) {
+    throw make_fs_error(`directory ${dir_path} doesn't exist, cannot remove`, 'ENOENT');
+  }
+  return ofs.rmdirSync(dir_path);
+}
+
+// Kept for compatibility if an extension passes a callback, though statAsync is preferred
+export function stat(path: string, callback: (err: NodeJS.ErrnoException | null, stats: ofs.Stats) => void): void {
+  path = convert_to_unix(path);
+  return ofs.stat(path, callback);
+}
+
+export async function statAsync(target_path: string): Promise<ofs.Stats> {
+  target_path = convert_to_unix(target_path);
+  return ofs.promises.stat(target_path);
+}
+
+export function statSync(target_path: string): ofs.Stats {
+  target_path = convert_to_unix(target_path);
+  if (!ofs.existsSync(target_path)) {
+    throw make_fs_error(`path ${target_path} doesn't exist, cannot stat`, 'ENOENT');
+  }
+  return ofs.statSync(target_path);
+}
+
+export async function unlinkAsync(file_path: string): Promise<void> {
+  file_path = convert_to_unix(file_path);
+  return ofs.promises.unlink(file_path);
+}
+
+export function unlinkSync(file_path: string): void {
+  file_path = convert_to_unix(file_path);
+  if (!ofs.existsSync(file_path)) {
+    throw make_fs_error(`file ${file_path} doesn't exist, cannot unlink`, 'ENOENT');
+  }
+  return ofs.unlinkSync(file_path);
+}
+
+export async function utimesAsync(target_path: string, atime: number | string | Date, mtime: number | string | Date): Promise<void> {
+  target_path = convert_to_unix(target_path);
+  return ofs.promises.utimes(target_path, atime, mtime);
+}
+
+export function watch(filename: string, options?: any, listener?: any): ofs.FSWatcher {
+  filename = convert_to_unix(filename);
+  if (!ofs.existsSync(filename)) {
+    throw make_fs_error(`path ${filename} doesn't exist, cannot watch`, 'ENOENT');
+  }
+  return ofs.watch(filename, options, listener);
 }

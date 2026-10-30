@@ -7,8 +7,6 @@ import * as config from '../config_manager.js';
 
 export * from './fs_re-export.js';
 
-export import Stats = ofs.Stats;
-
 export let {
 closeSync
 } = ofs;
