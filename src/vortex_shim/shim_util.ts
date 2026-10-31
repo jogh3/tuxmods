@@ -6,6 +6,17 @@ import * as os from 'os';
 import * as index from '../index.js'
 import * as config from '../config_manager.js';
 
+export class processCanceled extends Error {};
+export class UserCanceled extends Error {};
+export class SetupError extends Error {};
+
+export class ArgumentInvalid extends Error {
+  constructor(argument: string) {
+    super(`Invalid argument: "${argument}"`);
+    this.name = this.constructor.name;
+  }
+}
+// ---V
 export class Overlayable<KeyT extends string | number | symbol, ObjT> {
   private mBaseData: Record<KeyT, ObjT>;
   private mLayers: { [layer: string]: Record<KeyT, Partial<ObjT>> } = {};
@@ -44,6 +55,7 @@ export class Overlayable<KeyT extends string | number | symbol, ObjT> {
   }
 }
 
+// ---V
 export type VortexPaths = {
   base: string;
   assets: string;
@@ -84,7 +96,6 @@ export function getVortexPath(id: keyof VortexPaths): string {
   if (!ofs.existsSync(user_base)) ofs.mkdirSync(user_base);
 
   let vortex_path: string = "";
-  // TODO: get all the proton paths that could be requested, not difficult but requires research
   switch(id) {
     case "localAppData":
       vortex_path = path.join(user_base,"AppData","Local");
@@ -196,7 +207,8 @@ export function setdefault(obj: any, key: any, def: any){
   return obj[key];
 }
 
-export function makeoverlayabledictionary<keyt extends string | number | symbol, valuet>(basedata: Record<keyt, valuet>, layers: { [layerid: string]: Record<keyt, Partial<valuet>> }, deducelayer: (key: keyt, extraarg: any) => string): any { 
+// ---V
+export function makeOverlayableDictionary<keyt extends string | number | symbol, valuet>(basedata: Record<keyt, valuet>, layers: { [layerid: string]: Record<keyt, Partial<valuet>> }, deducelayer: (key: keyt, extraarg: any) => string): any { 
   // matching the lowercase parameter names exactly
   const res = new Overlayable<keyt, valuet>(basedata, deducelayer);
   
@@ -262,7 +274,58 @@ export async function walk(target: string, callback: (iterPath: string, stats: o
   await Promise.all(promise_arr);
 }
 
-class processCanceled extends Error {};
-class UserCanceled extends Error {};
-class SetupError extends Error {};
+export function setDefaultArray<T>(state: T, path: Array<string|number>,fallback: any[]): T{
+   if (path.length === 0) {
+      return state !== undefined && Array.isArray(state) ? (state.slice() as unknown as T) : (fallback as unknown as T);
+   }
+   let copy: any = (Array.isArray(state) ? state.slice() : {...(state as any)}) as any;
+   let stack: any[] = [[copy, path[0],path]];
 
+   while (stack.length > 0) {
+     let [parent, key, current_path] = stack.pop();
+     let cur_el = parent[key];
+     if (path.length === 1) {
+       parent[key] = !Object.hasOwnProperty.call(parent,key) || !Array.isArray(cur_el) ? fallback : cur_el.slice()
+     } else {
+       if (!Object.hasOwnProperty.call(parent,key) || typeof cur_el !== "object" || cur_el === null) {
+         parent[key] = {};
+       } else {
+         parent[key] = Array.isArray(cur_el) ? cur_el.slice() : { ...cur_el };
+       }
+       let next_path = current_path.slice(1);
+       stack.push([parent[key], next_path[0],next_path]);
+     }
+   }
+   return copy as T;
+}
+
+// ---V
+export function getSafe<T>(state: any, path: Array<string | number | undefined>,fallback: T): T {
+  if (!path || path.length === 0) {
+    return state ?? fallback;
+  }
+  let current = state;
+  for (let i = 0; i < path.length; i++) {
+    current = current?.[path[i]!];
+    if (current == null) {
+      return fallback;
+    }
+  }
+  return current ?? fallback;
+}
+
+// found in vortex/src/renderer/src/util/storeHelper.ts line 285
+// ---V
+export function addUniqueSafe<T>(state: T, path: Array<string|number>,value: any): T {
+  const copy = setDefaultArray(state,path,Array<unknown>());
+  const arr = getSafe(copy,path,Array<unknown>());
+
+  if (arr.indexOf(value) !== -1){
+    return state;
+  }
+  arr.push(value);
+  return copy;
+}
+
+export function batchDispatch() {
+}
