@@ -112,7 +112,7 @@ export function closeSync(fd: number): void {
   return ofs.closeSync(fd);
 }
 
-export async function removeAsync(dir_path: string, options?: ofs.RemoveOptions): Promise<void> {
+export async function removeAsync(dir_path: string, options?: any): Promise<void> {
   dir_path = convert_to_unix(dir_path);
   return ofs.remove(dir_path, options);
 }
