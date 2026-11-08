@@ -35,7 +35,7 @@ export function convert_to_unix(inp_path: string): string {
     if (!ofs.existsSync(proton_loc) || proton_loc == "") proton_loc = path.join(os.homedir(),".wine");
 
     let c_path: string = path.join(proton_loc, "drive_c");
-    let without_c: string = inp_path.slice(4,-1);
+    let without_c: string = inp_path.slice(4);
 
     proper_path = path.join(c_path,without_c);
   }
