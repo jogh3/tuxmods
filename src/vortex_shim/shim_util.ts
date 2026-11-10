@@ -147,7 +147,7 @@ function isobject(item: any): boolean {
 }
 
 // a = lhs, b = rhs
-export function deepmerge(a: any, b: any): any {
+export function deepMerge(a: any, b: any): any {
   if (a === undefined) return b;
   if (b === undefined) return a;
   
